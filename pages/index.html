@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudTrip - Book Your Flight</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+    <header>
+    </header>    
+    <main class="booking-container">
+        <div class="background-image">
+            <img src="../img/Gemini_Generated_Image_wjz6cuwjz6cuwjz6.jpg" alt="Plane in Background">
+        </div>
+        <div class="booking-form">
+            <h2>Book your next flight</h2>
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="from">From:</label>
+                        <select id="from">
+                            <option value="">Select city</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">To:</label>
+                        <select id="to">
+                            <option value="">Select city</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departure-date">Departure Date:</label>
+                        <input type="text" id="departure-date" placeholder="dd/mm/yyyy">
+                    </div>
+                    <div class="form-group">
+                        <label for="return-date">Return Date:</label>
+                        <input type="text" id="return-date" placeholder="dd/mm/yyyy">
+                    </div>
+                </div>
+
+                <button type="submit" class="order-button">Order Ticket</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 CloudTrip. All rights reserved.</p>
+    </footer>
+    <script src="../js/navbar.js"></script>
+</body>
+</html>
