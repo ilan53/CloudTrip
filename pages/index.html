@@ -6,10 +6,12 @@
     <title>CloudTrip - Book Your Flight</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> <!-- For icons -->
 </head>
 <body>
     <header>
-    </header>    
+    </header> 
+    <!-- Section 1: booking-container -->
     <main class="booking-container">
         <div class="background-image">
             <img src="../img/Gemini_Generated_Image_wjz6cuwjz6cuwjz6.jpg" alt="Plane in Background">
@@ -34,12 +36,33 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="departure-date">Departure Date:</label>
-                        <input type="text" id="departure-date" placeholder="dd/mm/yyyy">
+                        <label for="departure-date">Departure:</label>
+                        <input type="date">
                     </div>
                     <div class="form-group">
-                        <label for="return-date">Return Date:</label>
-                        <input type="text" id="return-date" placeholder="dd/mm/yyyy">
+                        <label for="return-date">Return:</label>
+                        <input type="date">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Passengers</label>
+                        <select>
+                            <option>1 Adult</option>
+                            <option>2 Adults</option>
+                            <option>3 Adults</option>
+                            <option>4 Adults</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Class</label>
+                        <select>
+                            <option>Economy</option>
+                            <option>Premium Economy</option>
+                            <option>Business</option>
+                            <option>First Class</option>
+                        </select>
                     </div>
                 </div>
 
@@ -47,6 +70,61 @@
             </form>
         </div>
     </main>
+
+       <!-- Section 2: Features -->
+       <section class="features">
+        <h2>Why Choose CloudTrip?</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Safe & Secure</h3>
+                <p>Your safety is our top priority</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-percentage"></i>
+                <h3>Best Prices</h3>
+                <p>Guaranteed lowest fares</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Always here to help you</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-plane"></i>
+                <h3>Wide Network</h3>
+                <p>Access to 1000+ destinations</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Popular Destinations -->
+    <section class="popular-destinations">
+        <h2>Popular Destinations</h2>
+        <div class="destinations-grid">
+            <div class="destination-card">
+                <img src="img/paris.jpg" alt="Paris">
+                <div class="destination-info">
+                    <h3>Paris</h3>
+                    <p>From $299</p>
+                </div>
+            </div>
+            <div class="destination-card">
+                <img src="img/tokyo.jpg" alt="Tokyo">
+                <div class="destination-info">
+                    <h3>Tokyo</h3>
+                    <p>From $599</p>
+                </div>
+            </div>
+            <div class="destination-card">
+                <img src="img/new-york.jpg" alt="New York">
+                <div class="destination-info">
+                    <h3>New York</h3>
+                    <p>From $399</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <p>&copy; 2025 CloudTrip. All rights reserved.</p>

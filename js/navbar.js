@@ -2,7 +2,7 @@
 function createNavbar() {
     const navbar = `
         <div class="logo">
-            <img src="../img/Gemini_Generated_Image_xper4mxper4mxper-Photoroom.png" alt="CloudTrip Logo">
+            <img src="../img/logo.png" alt="CloudTrip Logo">
         </div>
         <nav>
             <ul>
