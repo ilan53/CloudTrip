@@ -117,3 +117,128 @@ jQuery(document).ready(function($) {
 
 
 });
+
+// Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize date inputs with min date as today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        input.min = today;
+    });
+
+    // Handle flight search form submission
+    const searchForm = document.querySelector('.flight-search');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const from = this.querySelector('input[placeholder="City or Airport"]').value;
+            const to = this.querySelector('input[placeholder="City or Airport"]:last-of-type').value;
+            const departure = this.querySelector('input[type="date"]').value;
+            const returnDate = this.querySelector('input[type="date"]:last-of-type').value;
+            const passengers = this.querySelector('select').value;
+            const flightClass = this.querySelector('select:last-of-type').value;
+
+            // Validate form
+            if (!from || !to || !departure) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Store search parameters in localStorage
+            const searchParams = {
+                from,
+                to,
+                departure,
+                returnDate,
+                passengers,
+                flightClass
+            };
+            localStorage.setItem('searchParams', JSON.stringify(searchParams));
+
+            // Redirect to search results page
+            window.location.href = 'search.html';
+        });
+    }
+
+    // Handle login/signup buttons
+    const loginBtn = document.querySelector('.btn-login');
+    const signupBtn = document.querySelector('.btn-signup');
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function() {
+            // In a real application, this would open a login modal or redirect to login page
+            alert('Login functionality coming soon!');
+        });
+    }
+
+    if (signupBtn) {
+        signupBtn.addEventListener('click', function() {
+            // In a real application, this would open a signup modal or redirect to signup page
+            alert('Signup functionality coming soon!');
+        });
+    }
+
+    // Add smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Add animation to feature cards on scroll
+    const featureCards = document.querySelectorAll('.feature-card');
+    const observerOptions = {
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    featureCards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(card);
+    });
+
+    // Add hover effect to destination cards
+    const destinationCards = document.querySelectorAll('.destination-card');
+    destinationCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+
+    // Handle responsive navigation
+    const navToggle = document.createElement('button');
+    navToggle.className = 'nav-toggle';
+    navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        navbar.prepend(navToggle);
+        
+        navToggle.addEventListener('click', function() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        });
+    }
+});

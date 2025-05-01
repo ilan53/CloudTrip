@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - CloudTrip</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1>CloudTrip</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html" class="active">Search Flights</a></li>
+                <li class="my-bookings-link" style="display: none;"><a href="my-bookings.html">My Bookings</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-login" onclick="window.location.href='login.html'">Login</button>
+                <button class="btn-signup" onclick="window.location.href='signup.html'">Sign Up</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="search-results">
+            <div class="container">
+                <div class="search-summary">
+                    <h2>Flight Search Results</h2>
+                    <div class="search-params">
+                        <p><strong>From:</strong> <span id="from-city">Loading...</span></p>
+                        <p><strong>To:</strong> <span id="to-city">Loading...</span></p>
+                        <p><strong>Departure:</strong> <span id="departure-date">Loading...</span></p>
+                        <p><strong>Return:</strong> <span id="return-date">Loading...</span></p>
+                        <p><strong>Passengers:</strong> <span id="passengers">Loading...</span></p>
+                        <p><strong>Class:</strong> <span id="flight-class">Loading...</span></p>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <h3>Sort By</h3>
+                        <select id="sort-by">
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="duration-asc">Duration: Shortest</option>
+                            <option value="departure-asc">Departure: Earliest</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <h3>Stops</h3>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="nonstop" checked> Non-stop</label>
+                            <label><input type="checkbox" value="1stop" checked> 1 Stop</label>
+                            <label><input type="checkbox" value="2stops" checked> 2+ Stops</label>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h3>Price Range</h3>
+                        <div class="price-range">
+                            <input type="range" min="0" max="2000" value="2000" id="price-slider">
+                            <span id="price-value">$2000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flights-list">
+                    <!-- Flight cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About CloudTrip</h3>
+                <p>Your trusted partner in air travel since 2024. We're committed to making your journey comfortable and memorable.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search Flights</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: support@cloudtrip.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CloudTrip. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Load search parameters from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchParams = JSON.parse(localStorage.getItem('searchParams'));
+            if (searchParams) {
+                document.getElementById('from-city').textContent = searchParams.from;
+                document.getElementById('to-city').textContent = searchParams.to;
+                document.getElementById('departure-date').textContent = searchParams.departure;
+                document.getElementById('return-date').textContent = searchParams.returnDate || 'One-way';
+                document.getElementById('passengers').textContent = searchParams.passengers;
+                document.getElementById('flight-class').textContent = searchParams.flightClass;
+            }
+
+            // Sample flight data (in a real application, this would come from an API)
+            const flights = [
+                {
+                    id: 1,
+                    airline: 'SkyWings Airlines',
+                    flightNumber: 'SW123',
+                    departureTime: '08:00',
+                    arrivalTime: '11:30',
+                    duration: '3h 30m',
+                    price: 299,
+                    stops: 0,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                },
+                {
+                    id: 2,
+                    airline: 'Global Airways',
+                    flightNumber: 'GA456',
+                    departureTime: '12:15',
+                    arrivalTime: '15:45',
+                    duration: '3h 30m',
+                    price: 349,
+                    stops: 1,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                },
+                {
+                    id: 3,
+                    airline: 'Pacific Airlines',
+                    flightNumber: 'PA789',
+                    departureTime: '16:30',
+                    arrivalTime: '20:00',
+                    duration: '3h 30m',
+                    price: 279,
+                    stops: 0,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                }
+            ];
+
+            // Function to create flight card
+            function createFlightCard(flight) {
+                return `
+                    <div class="flight-card" data-price="${flight.price}" data-stops="${flight.stops}">
+                        <div class="flight-header">
+                            <h3>${flight.airline}</h3>
+                            <span class="flight-number">${flight.flightNumber}</span>
+                        </div>
+                        <div class="flight-details">
+                            <div class="time-details">
+                                <div class="departure">
+                                    <span class="time">${flight.departureTime}</span>
+                                    <span class="airport">${flight.departureAirport}</span>
+                                </div>
+                                <div class="duration">
+                                    <span class="duration-text">${flight.duration}</span>
+                                    <div class="stops">
+                                        ${flight.stops === 0 ? 'Non-stop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
+                                    </div>
+                                </div>
+                                <div class="arrival">
+                                    <span class="time">${flight.arrivalTime}</span>
+                                    <span class="airport">${flight.arrivalAirport}</span>
+                                </div>
+                            </div>
+                            <div class="price-details">
+                                <div class="price">$${flight.price}</div>
+                                <button class="btn-book" onclick="window.location.href='booking.html?flight=${flight.id}'">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Function to render flights
+            function renderFlights(flights) {
+                const flightsList = document.querySelector('.flights-list');
+                flightsList.innerHTML = flights.map(flight => createFlightCard(flight)).join('');
+            }
+
+            // Initial render
+            renderFlights(flights);
+
+            // Handle sorting
+            document.getElementById('sort-by').addEventListener('change', function() {
+                const sortedFlights = [...flights];
+                switch(this.value) {
+                    case 'price-asc':
+                        sortedFlights.sort((a, b) => a.price - b.price);
+                        break;
+                    case 'price-desc':
+                        sortedFlights.sort((a, b) => b.price - a.price);
+                        break;
+                    case 'duration-asc':
+                        sortedFlights.sort((a, b) => {
+                            const durationA = parseInt(a.duration);
+                            const durationB = parseInt(b.duration);
+                            return durationA - durationB;
+                        });
+                        break;
+                    case 'departure-asc':
+                        sortedFlights.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+                        break;
+                }
+                renderFlights(sortedFlights);
+            });
+
+            // Handle price range filter
+            const priceSlider = document.getElementById('price-slider');
+            const priceValue = document.getElementById('price-value');
+
+            priceSlider.addEventListener('input', function() {
+                priceValue.textContent = `$${this.value}`;
+                const filteredFlights = flights.filter(flight => flight.price <= this.value);
+                renderFlights(filteredFlights);
+            });
+
+            // Handle stops filter
+            const stopCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+            stopCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const selectedStops = Array.from(stopCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => {
+                            if (cb.value === 'nonstop') return 0;
+                            if (cb.value === '1stop') return 1;
+                            return 2;
+                        });
+                    
+                    const filteredFlights = flights.filter(flight => 
+                        selectedStops.includes(flight.stops)
+                    );
+                    renderFlights(filteredFlights);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

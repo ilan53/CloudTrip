@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - CloudTrip</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1>CloudTrip</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search Flights</a></li>
+                <li><a href="my-bookings.html">My Bookings</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-login">Login</button>
+                <button class="btn-signup">Sign Up</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="confirmation">
+            <div class="container">
+                <div class="confirmation-content">
+                    <div class="confirmation-header">
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Booking Confirmed!</h2>
+                        <p>Thank you for choosing CloudTrip. Your booking has been successfully confirmed.</p>
+                    </div>
+
+                    <div class="booking-details">
+                        <div class="booking-info">
+                            <h3>Booking Reference</h3>
+                            <p class="reference-number">SW<span id="booking-reference">123456</span></p>
+                        </div>
+
+                        <div class="flight-info">
+                            <h3>Flight Details</h3>
+                            <div class="flight-summary">
+                                <div class="flight-header">
+                                    <h4 id="confirmation-airline">Loading...</h4>
+                                    <span class="flight-number" id="confirmation-flight-number">Loading...</span>
+                                </div>
+                                <div class="flight-details">
+                                    <div class="time-details">
+                                        <div class="departure">
+                                            <span class="time" id="confirmation-departure-time">Loading...</span>
+                                            <span class="airport" id="confirmation-departure-airport">Loading...</span>
+                                        </div>
+                                        <div class="duration">
+                                            <span class="duration-text" id="confirmation-duration">Loading...</span>
+                                            <div class="stops" id="confirmation-stops">Loading...</div>
+                                        </div>
+                                        <div class="arrival">
+                                            <span class="time" id="confirmation-arrival-time">Loading...</span>
+                                            <span class="airport" id="confirmation-arrival-airport">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="passenger-info">
+                            <h3>Passenger Information</h3>
+                            <div class="passenger-details">
+                                <p><strong>Name:</strong> <span id="passenger-name">Loading...</span></p>
+                                <p><strong>Email:</strong> <span id="passenger-email">Loading...</span></p>
+                                <p><strong>Phone:</strong> <span id="passenger-phone">Loading...</span></p>
+                            </div>
+                        </div>
+
+                        <div class="payment-info">
+                            <h3>Payment Details</h3>
+                            <div class="payment-details">
+                                <p><strong>Amount Paid:</strong> <span id="payment-amount">Loading...</span></p>
+                                <p><strong>Payment Method:</strong> <span id="payment-method">Loading...</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-actions">
+                        <button class="btn-download" onclick="window.print()">
+                            <i class="fas fa-download"></i> Download Ticket
+                        </button>
+                        <button class="btn-email" onclick="sendEmail()">
+                            <i class="fas fa-envelope"></i> Send to Email
+                        </button>
+                    </div>
+
+                    <div class="next-steps">
+                        <h3>Next Steps</h3>
+                        <ul>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Check your email for the booking confirmation</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Download your e-ticket or save it to your mobile device</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Arrive at the airport at least 2 hours before departure</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Have your passport and travel documents ready</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About CloudTrip</h3>
+                <p>Your trusted partner in air travel since 2024. We're committed to making your journey comfortable and memorable.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search Flights</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: support@cloudtrip.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CloudTrip. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get booking data from localStorage
+            const bookingData = JSON.parse(localStorage.getItem('bookingData'));
+            if (bookingData) {
+                // Generate random booking reference
+                const bookingReference = Math.floor(100000 + Math.random() * 900000);
+                document.getElementById('booking-reference').textContent = bookingReference;
+
+                // Sample flight data (in a real application, this would come from an API)
+                const flights = {
+                    1: {
+                        airline: 'SkyWings Airlines',
+                        flightNumber: 'SW123',
+                        departureTime: '08:00',
+                        arrivalTime: '11:30',
+                        duration: '3h 30m',
+                        price: 299,
+                        stops: 0,
+                        departureAirport: 'JFK',
+                        arrivalAirport: 'LAX'
+                    },
+                    2: {
+                        airline: 'Global Airways',
+                        flightNumber: 'GA456',
+                        departureTime: '12:15',
+                        arrivalTime: '15:45',
+                        duration: '3h 30m',
+                        price: 349,
+                        stops: 1,
+                        departureAirport: 'JFK',
+                        arrivalAirport: 'LAX'
+                    },
+                    3: {
+                        airline: 'Pacific Airlines',
+                        flightNumber: 'PA789',
+                        departureTime: '16:30',
+                        arrivalTime: '20:00',
+                        duration: '3h 30m',
+                        price: 279,
+                        stops: 0,
+                        departureAirport: 'JFK',
+                        arrivalAirport: 'LAX'
+                    }
+                };
+
+                const flight = flights[bookingData.flightId];
+                if (flight) {
+                    document.getElementById('confirmation-airline').textContent = flight.airline;
+                    document.getElementById('confirmation-flight-number').textContent = flight.flightNumber;
+                    document.getElementById('confirmation-departure-time').textContent = flight.departureTime;
+                    document.getElementById('confirmation-departure-airport').textContent = flight.departureAirport;
+                    document.getElementById('confirmation-arrival-time').textContent = flight.arrivalTime;
+                    document.getElementById('confirmation-arrival-airport').textContent = flight.arrivalAirport;
+                    document.getElementById('confirmation-duration').textContent = flight.duration;
+                    document.getElementById('confirmation-stops').textContent = flight.stops === 0 ? 'Non-stop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`;
+                }
+
+                // Populate passenger information
+                document.getElementById('passenger-name').textContent = `${bookingData.passenger.title} ${bookingData.passenger.firstName} ${bookingData.passenger.lastName}`;
+                document.getElementById('passenger-email').textContent = bookingData.passenger.email;
+                document.getElementById('passenger-phone').textContent = bookingData.passenger.phone;
+
+                // Populate payment information
+                document.getElementById('payment-amount').textContent = `$${flight.price}`;
+                document.getElementById('payment-method').textContent = 'Credit Card';
+            }
+        });
+
+        function sendEmail() {
+            alert('Email confirmation has been sent to your registered email address.');
+        }
+    </script>
+</body>
+</html> 
