@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Booking - CloudTrip</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1>CloudTrip</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search Flights</a></li>
+                <li><a href="my-bookings.html">My Bookings</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-login">Login</button>
+                <button class="btn-signup">Sign Up</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="booking">
+            <div class="container">
+                <div class="booking-content">
+                    <div class="flight-summary">
+                        <h2>Flight Details</h2>
+                        <div class="flight-info">
+                            <div class="flight-header">
+                                <h3 id="booking-airline">Loading...</h3>
+                                <span class="flight-number" id="booking-flight-number">Loading...</span>
+                            </div>
+                            <div class="flight-details">
+                                <div class="time-details">
+                                    <div class="departure">
+                                        <span class="time" id="booking-departure-time">Loading...</span>
+                                        <span class="airport" id="booking-departure-airport">Loading...</span>
+                                    </div>
+                                    <div class="duration">
+                                        <span class="duration-text" id="booking-duration">Loading...</span>
+                                        <div class="stops" id="booking-stops">Loading...</div>
+                                    </div>
+                                    <div class="arrival">
+                                        <span class="time" id="booking-arrival-time">Loading...</span>
+                                        <span class="airport" id="booking-arrival-airport">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="price-details">
+                                    <div class="price" id="booking-price">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-form">
+                        <h2>Passenger Information</h2>
+                        <form id="passenger-form">
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <select id="title" required>
+                                    <option value="">Select Title</option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Ms">Ms</option>
+                                    <option value="Dr">Dr</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">First Name</label>
+                                    <input type="text" id="first-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Last Name</label>
+                                    <input type="text" id="last-name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="passport">Passport Number</label>
+                                <input type="text" id="passport" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nationality">Nationality</label>
+                                <select id="nationality" required>
+                                    <option value="">Select Nationality</option>
+                                    <option value="US">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                    <!-- Add more countries as needed -->
+                                </select>
+                            </div>
+
+                            <h3>Payment Information</h3>
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" id="card-number" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiry">Expiry Date</label>
+                                    <input type="text" id="expiry" placeholder="MM/YY" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="card-name">Name on Card</label>
+                                <input type="text" id="card-name" required>
+                            </div>
+
+                            <div class="terms">
+                                <input type="checkbox" id="terms" required>
+                                <label for="terms">I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a></label>
+                            </div>
+
+                            <button type="submit" class="btn-confirm">Confirm Booking</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About CloudTrip</h3>
+                <p>Your trusted partner in air travel since 2024. We're committed to making your journey comfortable and memorable.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search Flights</a></li>
+                    <li><a href="my-bookings.html">My Bookings</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: support@cloudtrip.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CloudTrip. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get flight ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const flightId = urlParams.get('flight');
+
+            // Sample flight data (in a real application, this would come from an API)
+            const flights = {
+                1: {
+                    airline: 'SkyWings Airlines',
+                    flightNumber: 'SW123',
+                    departureTime: '08:00',
+                    arrivalTime: '11:30',
+                    duration: '3h 30m',
+                    price: 299,
+                    stops: 0,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                },
+                2: {
+                    airline: 'Global Airways',
+                    flightNumber: 'GA456',
+                    departureTime: '12:15',
+                    arrivalTime: '15:45',
+                    duration: '3h 30m',
+                    price: 349,
+                    stops: 1,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                },
+                3: {
+                    airline: 'Pacific Airlines',
+                    flightNumber: 'PA789',
+                    departureTime: '16:30',
+                    arrivalTime: '20:00',
+                    duration: '3h 30m',
+                    price: 279,
+                    stops: 0,
+                    departureAirport: 'JFK',
+                    arrivalAirport: 'LAX'
+                }
+            };
+
+            // Populate flight details
+            if (flightId && flights[flightId]) {
+                const flight = flights[flightId];
+                document.getElementById('booking-airline').textContent = flight.airline;
+                document.getElementById('booking-flight-number').textContent = flight.flightNumber;
+                document.getElementById('booking-departure-time').textContent = flight.departureTime;
+                document.getElementById('booking-departure-airport').textContent = flight.departureAirport;
+                document.getElementById('booking-arrival-time').textContent = flight.arrivalTime;
+                document.getElementById('booking-arrival-airport').textContent = flight.arrivalAirport;
+                document.getElementById('booking-duration').textContent = flight.duration;
+                document.getElementById('booking-stops').textContent = flight.stops === 0 ? 'Non-stop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`;
+                document.getElementById('booking-price').textContent = `$${flight.price}`;
+            }
+
+            // Handle form submission
+            const bookingForm = document.getElementById('passenger-form');
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validate form
+                if (!this.checkValidity()) {
+                    alert('Please fill in all required fields correctly');
+                    return;
+                }
+
+                // In a real application, you would send this data to your backend
+                const bookingData = {
+                    flightId,
+                    passenger: {
+                        title: document.getElementById('title').value,
+                        firstName: document.getElementById('first-name').value,
+                        lastName: document.getElementById('last-name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        passport: document.getElementById('passport').value,
+                        nationality: document.getElementById('nationality').value
+                    },
+                    payment: {
+                        cardNumber: document.getElementById('card-number').value,
+                        expiry: document.getElementById('expiry').value,
+                        cvv: document.getElementById('cvv').value,
+                        cardName: document.getElementById('card-name').value
+                    }
+                };
+
+                // Store booking data in localStorage
+                localStorage.setItem('bookingData', JSON.stringify(bookingData));
+
+                // Redirect to confirmation page
+                window.location.href = 'confirmation.html';
+            });
+        });
+    </script>
+</body>
+</html> 
