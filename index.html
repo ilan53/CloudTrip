@@ -1,130 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CloudTrip - Book Your Next Adventure</title>
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudTrip - Book Your Flight</title>
+    <link rel="stylesheet" href="index.css">
+</head>
 <body>
     <header>
-        <!-- Navbar will be inserted here by navbar.js -->
+        <div class="logo">
+            <img src="img/Gemini_Generated_Image_xper4mxper4mxper-Photoroom.png" alt="CloudTrip Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Most Visited</a></li>
+                <li><a href="#">Home</a></li>
+                <li><a href="#" class="login">Login</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Find Your Perfect Flight</h2>
-                <p>Discover amazing destinations at the best prices</p>
-                <div class="search-container">
-                    <form class="flight-search">
-                        <div class="search-row">
-                            <div class="search-group">
-                                <label>From</label>
-                                <input type="text" placeholder="City or Airport">
-                            </div>
-                            <div class="search-group">
-                                <label>To</label>
-                                <input type="text" placeholder="City or Airport">
-                            </div>
-                        </div>
-                        <div class="search-row">
-                            <div class="search-group">
-                                <label>Departure</label>
-                                <input type="date">
-                            </div>
-                            <div class="search-group">
-                                <label>Return</label>
-                                <input type="date">
-                            </div>
-                        </div>
-                        <div class="search-row">
-                            <div class="search-group">
-                                <label>Passengers</label>
-                                <select>
-                                    <option>1 Adult</option>
-                                    <option>2 Adults</option>
-                                    <option>3 Adults</option>
-                                    <option>4 Adults</option>
-                                </select>
-                            </div>
-                            <div class="search-group">
-                                <label>Class</label>
-                                <select>
-                                    <option>Economy</option>
-                                    <option>Premium Economy</option>
-                                    <option>Business</option>
-                                    <option>First Class</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-search">Search Flights</button>
-                    </form>
+    <main class="booking-container">
+        <div class="background-image">
+            <img src="img/Gemini_Generated_Image_wjz6cuwjz6cuwjz6.jpg" alt="Plane in Background">
+        </div>
+        <div class="booking-form">
+            <h2>Book your next flight</h2>
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="from">From:</label>
+                        <select id="from">
+                            <option value="">Select city</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">To:</label>
+                        <select id="to">
+                            <option value="">Select city</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <section class="features">
-            <h2>Why Choose CloudTrip?</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Safe & Secure</h3>
-                    <p>Your safety is our top priority</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departure-date">Departure Date:</label>
+                        <input type="text" id="departure-date" placeholder="dd/mm/yyyy">
+                    </div>
+                    <div class="form-group">
+                        <label for="return-date">Return Date:</label>
+                        <input type="text" id="return-date" placeholder="dd/mm/yyyy">
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <i class="fas fa-percentage"></i>
-                    <h3>Best Prices</h3>
-                    <p>Guaranteed lowest fares</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-headset"></i>
-                    <h3>24/7 Support</h3>
-                    <p>Always here to help you</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-plane"></i>
-                    <h3>Wide Network</h3>
-                    <p>Access to 1000+ destinations</p>
-                </div>
-            </div>
-        </section>
 
-        <section class="popular-destinations">
-            <h2>Popular Destinations</h2>
-            <div class="destinations-grid">
-                <div class="destination-card">
-                    <img src="img/paris.jpg" alt="Paris">
-                    <div class="destination-info">
-                        <h3>Paris</h3>
-                        <p>From $299</p>
-                    </div>
-                </div>
-                <div class="destination-card">
-                    <img src="img/tokyo.jpg" alt="Tokyo">
-                    <div class="destination-info">
-                        <h3>Tokyo</h3>
-                        <p>From $599</p>
-                    </div>
-                </div>
-                <div class="destination-card">
-                    <img src="img/new-york.jpg" alt="New York">
-                    <div class="destination-info">
-                        <h3>New York</h3>
-                        <p>From $399</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                <button type="submit" class="order-button">Order Ticket</button>
+            </form>
+        </div>
     </main>
 
     <footer>
-        <!-- Footer will be inserted here by navbar.js -->
+        <p>&copy; 2025 CloudTrip. All rights reserved.</p>
     </footer>
-
-    <script src="js/navbar.js"></script>
-    <script src="js/auth.js"></script>
 </body>
 </html>
