@@ -1,3 +1,4 @@
+/* Contact Section */
 .contact {
   font-size: 14px;
 }
@@ -7,14 +8,15 @@
   font-weight: bold;
 }
 
+/* Booking Section */
 main.booking-container {
   position: relative;
   min-height: 70vh;
   padding: 40px 20px;
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* במקום center */
-  padding-right: 60px; /* מוסיף רווח מהקצה */
+  justify-content: flex-end; /* יישור לימין */
+  padding-right: 60px; /* הוספת ריווח מימין */
   padding-left: 20px;
 }
 
@@ -26,17 +28,17 @@ main.booking-container {
   height: 100%;
   object-fit: cover;
   z-index: -1;
-  opacity: 0.3;
+  opacity: 1; /* ניתן להסיר אם ברירת המחדל היא 1 */
 }
 
 .booking-form {
   background-color: rgba(26, 115, 232, 0.1); /* כחול שקוף */
   padding: 30px 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 700px;
   width: 100%;
-}  
+}
 
 .booking-form h2 {
   font-size: 26px;
@@ -135,4 +137,15 @@ form {
 .feature-card h3 {
   color: #2c3e50;
   margin-bottom: 0.5rem;
+}
+
+/* Popular Destinations Section */
+.destination-card {
+  font-size: 14px;
+  margin-top: 10px;
+  /* הערה: הצבע כאן נדרס על ידי ההצהרה הבאה */
+  color: #333;
+  font-family: monospace;
+  font-weight: bold;
+  color: #1a73e8; /* הצבע הסופי שיוצג */
 }
