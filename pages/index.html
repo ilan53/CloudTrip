@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CloudTrip - Book Your Flight</title>
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> <!-- For icons -->
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/index.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-    <header>
-    </header> 
+    <header></header>
+
     <!-- Section 1: booking-container -->
     <main class="booking-container">
         <div class="background-image">
-            <img src="../img/Gemini_Generated_Image_wjz6cuwjz6cuwjz6.jpg" alt="Plane in Background">
+            <img src="../img/Gemini_Generated_Image_wjz6cuwjz6cuwjz6.jpg" alt="Plane in Background" />
         </div>
         <div class="booking-form">
             <h2>Book your next flight</h2>
-            <form>
+            <form id="flight-search-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="from">From:</label>
@@ -37,31 +37,31 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="departure-date">Departure:</label>
-                        <input type="date">
+                        <input type="date" id="departure-date" />
                     </div>
                     <div class="form-group">
                         <label for="return-date">Return:</label>
-                        <input type="date">
+                        <input type="date" id="return-date" />
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Passengers</label>
-                        <select>
-                            <option>1 Adult</option>
-                            <option>2 Adults</option>
-                            <option>3 Adults</option>
-                            <option>4 Adults</option>
+                        <label for="passengers">Passengers</label>
+                        <select id="passengers">
+                            <option value="1">1 Adult</option>
+                            <option value="2">2 Adults</option>
+                            <option value="3">3 Adults</option>
+                            <option value="4">4 Adults</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Class</label>
-                        <select>
-                            <option>Economy</option>
-                            <option>Premium Economy</option>
-                            <option>Business</option>
-                            <option>First Class</option>
+                        <label for="flight-class">Class</label>
+                        <select id="flight-class">
+                            <option value="Economy">Economy</option>
+                            <option value="Premium Economy">Premium Economy</option>
+                            <option value="Business">Business</option>
+                            <option value="First Class">First Class</option>
                         </select>
                     </div>
                 </div>
@@ -71,8 +71,8 @@
         </div>
     </main>
 
-       <!-- Section 2: Features -->
-       <section class="features">
+    <!-- Section 2: Features -->
+    <section class="features">
         <h2>Why Choose CloudTrip?</h2>
         <div class="feature-grid">
             <div class="feature-card">
@@ -103,21 +103,21 @@
         <h2>Popular Destinations</h2>
         <div class="destinations-grid">
             <div class="destination-card">
-                <img src="../img/paris.jpg" alt="Paris">
+                <img src="../img/paris.jpg" alt="Paris" />
                 <div class="destination-info">
                     <h3>Paris</h3>
                     <p>From $299</p>
                 </div>
             </div>
             <div class="destination-card">
-                <img src="../img/rome.jpg" alt="Tokyo">
+                <img src="../img/rome.jpg" alt="Tokyo" />
                 <div class="destination-info">
                     <h3>Tokyo</h3>
                     <p>From $599</p>
                 </div>
             </div>
             <div class="destination-card">
-                <img src="../img/new-york.jpg" alt="New York">
+                <img src="../img/new-york.jpg" alt="New York" />
                 <div class="destination-info">
                     <h3>New York</h3>
                     <p>From $399</p>
@@ -126,9 +126,16 @@
         </div>
     </section>
 
+    <!-- Section 4: Flight results -->
+    <section>
+        <div id="flight-results" class="results-container"></div>
+    </section>
+
     <footer>
         <p>&copy; 2025 CloudTrip. All rights reserved.</p>
     </footer>
+
     <script src="../js/navbar.js"></script>
+    <script src="../js/index.js"></script>
 </body>
 </html>
