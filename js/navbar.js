@@ -6,7 +6,7 @@ function createNavbar() {
         </div>
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="../index.html">Home</a></li>
                 <li><a href="mostVisited.html">Most Visited</a></li>
                 <li><a href="contact.html">Contact</a></li>
                 <li><a href="login.html" class="btn-login">Login</a></li>
