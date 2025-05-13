@@ -9,25 +9,26 @@ const client = new DynamoDBClient({ region: REGION });
 const docClient = DynamoDBDocumentClient.from(client);
 
 // קריאה לקובץ JSON
-const jsonFlights = require('./flights.json');  // אם הקובץ הוא 'flights.json'
+const jsonFlights = require('./flights_data.json');
 
 async function uploadFlights() {
   for (const flight of jsonFlights) {
+    const id = `${flight.flightNumber}-${flight.date}-${flight.time}`; // מזהה ייחודי
+
     const item = {
-      id: `${flight.operatorShort}-${flight.number}-${flight.schedueTime}`, // יצירת id ייחודי לכל טיסה
-      operatorShort: flight.operatorShort,
-      operatorLong: flight.operatorLong,
-      schedueTime: flight.schedueTime,
-      actualTime: flight.actualTime,
-      type: flight.type,
-      cityCode: flight.cityCode,
-      airport: flight.airport,
-      city: flight.city,
-      country: flight.country,
-      terminal: flight.terminal,
-      counter: flight.counter,
-      zone: flight.zone,
-      status: flight.status,
+      id,
+      from: flight.from,
+      to: flight.to,
+      date: flight.date,
+      time: flight.time,
+      flightNumber: flight.flightNumber,
+      operator: flight.operator,
+      price: flight.price,
+      durationMinutes: flight.durationMinutes,
+      stops: flight.stops,
+      aircraft: flight.aircraft,
+      availableSeats: flight.availableSeats,
+      classOptions: flight.classOptions
     };
 
     try {
