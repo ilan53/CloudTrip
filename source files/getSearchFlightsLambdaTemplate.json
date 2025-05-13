@@ -1,0 +1,56 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "GetSearchFlightsFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "getSearchFlights",
+        "Runtime": "nodejs18.x",
+        "Handler": "index.handler",
+        "Role": "arn:aws:iam::286801031611:role/LabRole",
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": ["\n", [
+              "const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');",
+              "const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');",
+              "",
+              "const client = new DynamoDBClient({ region: 'us-east-1' });",
+              "const docClient = DynamoDBDocumentClient.from(client);",
+              "const TABLE_NAME = 'DynamoFlights-Flights-XW9V1JY3U3QK';",
+              "",
+              "exports.handler = async (event) => {",
+              "  try {",
+              "    const params = event.queryStringParameters || {};",
+              "    const { from, to, departure, class: flightClass } = params;",
+              "",
+              "    const data = await docClient.send(new ScanCommand({ TableName: TABLE_NAME }));",
+              "",
+              "    const filtered = data.Items.filter(item =>",
+              "      (!from || item.from === from) &&",
+              "      (!to || item.to === to) &&",
+              "      (!departure || item.date === departure) &&",
+              "      (!flightClass || (item.classOptions || []).includes(flightClass))",
+              "    );",
+              "",
+              "    return {",
+              "      statusCode: 200,",
+              "      headers: { 'Access-Control-Allow-Origin': '*' },",
+              "      body: JSON.stringify(filtered)",
+              "    };",
+              "  } catch (err) {",
+              "    console.error('Error:', err);",
+              "    return {",
+              "      statusCode: 500,",
+              "      headers: { 'Access-Control-Allow-Origin': '*' },",
+              "      body: JSON.stringify({ error: 'Internal server error' })",
+              "    };",
+              "  }",
+              "};"
+            ]]
+          }
+        },
+        "Timeout": 10
+      }
+    }
+  }
+}
