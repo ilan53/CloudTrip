@@ -1,32 +1,36 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_1nRYrH9dW',
-  ClientId: '4n8f48rgjjsajma81runlu4nme',
+  UserPoolId: 'us-east-1_6jpiemW5Y',
+  ClientId: '4oe6gonue97ep6naukr5n1obl3',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
   redirectUri: 'https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html'
 };
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function () {
   const idToken = localStorage.getItem('id_token');
   console.log('On Load: ID Token:', idToken);
   if (idToken) {
     displayUserInfo(idToken);
-    const currentUrl = window.location.origin + window.location.pathname; // משאיר רק את ה-URL הבסיסי
-    window.history.replaceState({}, document.title, currentUrl); // מחליף את ה-URL בלי לרענן את הדף
+    const currentUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, currentUrl);
   } else {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     if (code) {
       exchangeCodeForTokens(code);
-      const currentUrl = window.location.origin + window.location.pathname; // משאיר רק את ה-URL הבסיסי
-      window.history.replaceState({}, document.title, currentUrl); // מחליף את ה-URL בלי לרענן את הדף
+      const currentUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, currentUrl);
     } else {
       updateAuthUI(null);
     }
   }
 });
 
+function signUp() {
+  const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/signup?client_id=${cognitoConfig.ClientId}&response_type=code&scope=email+openid+phone&redirect_uri=${cognitoConfig.redirectUri}`;
+  window.location.href = url;
+}
 
 
 function signIn() {
@@ -85,11 +89,19 @@ function displayUserInfo(idToken) {
   try {
       const payload = JSON.parse(atob(idToken.split('.')[1]));
       console.log('User Info:', payload);
+
       const username = payload['cognito:username'] || 'User';
+      const fullName = `${payload.name || ''} ${payload.family_name || ''}`.trim();
+      const email = payload.email;
       const userGroup = payload["cognito:groups"]
-      ? payload["cognito:groups"][0]
-      : null;
-      updateAuthUI(username,userGroup);
+        ? payload["cognito:groups"][0]
+        : null;
+
+      updateAuthUI(username, userGroup);
+
+      // ✅ Call sync function
+      syncUserToDynamo(fullName, email);
+
   } catch (error) {
       console.error('Error displaying user info:', error);
       Swal.fire({
@@ -100,39 +112,60 @@ function displayUserInfo(idToken) {
   }
 }
 
-function updateAuthUI(username,userGroup) {
+
+async function syncUserToDynamo(fullName, email) {
+  try {
+    const response = await fetch('https://8r8jt6jpy9.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fullName, email })
+    });
+
+    if (!response.ok) throw new Error('Sync failed');
+    console.log('User synced to DynamoDB');
+  } catch (err) {
+    console.error('Error syncing user:', err);
+  }
+}
+
+
+function updateAuthUI(username, userGroup) {
   const userGreeting = document.getElementById('userGreeting');
   const authButton = document.getElementById('authButton');
   const adminPage = document.getElementById('adminCheck');
+  const createChef = document.getElementById('createChef');
+  const authContainer = document.getElementById('authContainer');
+
+  // השבתה זמנית אם האלמנטים לא קיימים
+  if (!userGreeting || !authButton || !adminPage || !createChef || !authContainer) {
+    console.log("⏸️ UI update skipped — elements not found in DOM");
+    return;
+  }
 
   if (username) {
-      userGreeting.textContent = `Hello, ${username}`;
-      userGreeting.classList.remove('d-none');
-      authButton.textContent = 'Sign Out';
-      authButton.onclick = signOut;
-      authButton.classList.remove('btn-primary');
-      authButton.classList.add('btn-danger');
-      // Admin-specific logic
-      if (userGroup=='Admin') {
-        adminPage.classList.remove('d-none'); // Show the Admin Page link
-    } else {
-        adminPage.classList.add('d-none'); // Hide the Admin Page link
-    }
-    if (userGroup=='ChefUser') {
-      createChef.classList.remove('d-none'); // Show the Admin Page link
-  } else {
-    createChef.classList.add('d-none'); // Hide the Admin Page link
-  }
-  } else {
-      userGreeting.textContent = '';
-      userGreeting.classList.add('d-none');
-      authButton.textContent = 'Sign In';
-      authButton.onclick = signIn;
-      authButton.classList.remove('btn-danger');
-      authButton.classList.add('btn-primary');
-      adminPage.classList.add('d-none'); // Hide the Admin Page link
-      createChef.classList.add('d-none'); // Hide the Admin Page link
-    }
+    userGreeting.textContent = `Hello, ${username}`;
+    userGreeting.classList.remove('d-none');
+    authButton.textContent = 'Sign Out';
+    authButton.onclick = signOut;
+    authButton.classList.remove('btn-primary');
+    authButton.classList.add('btn-danger');
 
-  document.getElementById('authContainer').classList.remove('d-none');
+    adminPage.classList.toggle('d-none', userGroup !== 'Admin');
+    createChef.classList.toggle('d-none', userGroup !== 'ChefUser');
+  } else {
+    userGreeting.textContent = '';
+    userGreeting.classList.add('d-none');
+    authButton.textContent = 'Sign In';
+    authButton.onclick = signIn;
+    authButton.classList.remove('btn-danger');
+    authButton.classList.add('btn-primary');
+
+    adminPage.classList.add('d-none');
+    createChef.classList.add('d-none');
+  }
+
+  authContainer.classList.remove('d-none');
 }
+

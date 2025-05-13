@@ -1,0 +1,115 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "SyncUserToDynamo": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "SyncUserToDynamo",
+        "Handler": "index.handler",
+        "Runtime": "nodejs18.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "",
+                "exports.handler = async (event) => {",
+                "  const body = JSON.parse(event.body || '{}');",
+                "  const email = body.email;",
+                "  const fullName = body.fullName;",
+                "",
+                "  const params = {",
+                "    TableName: 'Users',",
+                "    Key: { email }",
+                "  };",
+                "",
+                "  const result = await docClient.get(params).promise();",
+                "  if (!result.Item) {",
+                "    await docClient.put({",
+                "      TableName: 'Users',",
+                "      Item: {",
+                "        email,",
+                "        fullName,",
+                "        bookedFlights: []",
+                "      }",
+                "    }).promise();",
+                "  }",
+                "",
+                "  return { statusCode: 200, body: 'User synced' };",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+
+    "SyncUserApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "SyncUserApi",
+        "ProtocolType": "HTTP"
+      }
+    },
+    "SyncUserApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": { "Ref": "SyncUserApi" },
+        "StageName": "prod",
+        "AutoDeploy": true
+      }
+    },
+    "SyncUserIntegration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": { "Ref": "SyncUserApi" },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [ "SyncUserToDynamo", "Arn" ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "IntegrationMethod": "POST"
+      }
+    },
+    "SyncUserRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": { "Ref": "SyncUserApi" },
+        "RouteKey": "POST /syncUser",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              { "Ref": "SyncUserIntegration" }
+            ]
+          ]
+        }
+      }
+    },
+    "SyncUserPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "SyncUserToDynamo" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SyncUserApi}/*/POST/syncUser"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ApiEndpoint": {
+      "Description": "Invoke URL for syncUser endpoint",
+      "Value": {
+        "Fn::Sub": "https://${SyncUserApi}.execute-api.${AWS::Region}.amazonaws.com/prod/syncUser"
+      }
+    }
+  }
+}
