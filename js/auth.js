@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_6jpiemW5Y',
-  ClientId: '4oe6gonue97ep6naukr5n1obl3',
+  UserPoolId: 'us-east-1_PTG0MvHKY',
+  ClientId: '603h9cilpbhun5b0hgp2eaa8t5',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -28,13 +28,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function signUp() {
-  const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/signup?client_id=${cognitoConfig.ClientId}&response_type=code&scope=email+openid+phone&redirect_uri=${cognitoConfig.redirectUri}`;
+  const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/signup?client_id=${cognitoConfig.ClientId}&response_type=code&scope=email+openid+profile&redirect_uri=${cognitoConfig.redirectUri}`;
   window.location.href = url;
 }
 
-
 function signIn() {
-  const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/login?client_id=${cognitoConfig.ClientId}&response_type=code&scope=email+openid+phone&redirect_uri=${cognitoConfig.redirectUri}`;
+  const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/login?client_id=${cognitoConfig.ClientId}&response_type=code&scope=email+openid+profile&redirect_uri=${cognitoConfig.redirectUri}`;
   window.location.href = url;
 }
 

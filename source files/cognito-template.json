@@ -71,6 +71,9 @@
         "LogoutURLs": [
           "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
         ],
+        "AllowedOAuthFlows": [ "code" ],
+        "AllowedOAuthScopes": [ "openid", "email", "profile" ],
+        "AllowedOAuthFlowsUserPoolClient": true,
         "AccessTokenValidity": 60,
         "IdTokenValidity": 60,
         "RefreshTokenValidity": 5,
@@ -88,16 +91,45 @@
       "Properties": {
         "GroupName": "Admins",
         "UserPoolId": { "Ref": "UserPool" },
-        "Description": "Admin group for CloudTrip"
+        "Description": "Admin group for CloudTrip",
+        "RoleArn": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        }
+      }
+    },
+
+    "UserPoolDomain": {
+      "Type": "AWS::Cognito::UserPoolDomain",
+      "Properties": {
+        "Domain": "cloudtripuserpool",
+        "UserPoolId": { "Ref": "UserPool" }
       }
     }
   },
+
   "Outputs": {
     "UserPoolId": {
+      "Description": "Change in auth.js",
       "Value": { "Ref": "UserPool" }
     },
     "UserPoolClientId": {
+      "Description": "Change in auth.js",
       "Value": { "Ref": "UserPoolClient" }
+    },
+    "HostedUIDomain": {
+      "Value": {
+        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com"
+      }
+    },
+    "HostedUILoginURL": {
+      "Description": "Link to Hosted Login Page",
+      "Value": {
+        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
+      }
+    },
+    "ManualSetupInstructions": {
+      "Description": "Manual step: Configure Managed Login Style in Cognito Console",
+      "Value": "1. Go to Cognito → User Pool → Managed Login\n2. Click 'Create Style' and assign to CloudTripClient\n3. Customize branding (optional)"
     }
   }
 }
