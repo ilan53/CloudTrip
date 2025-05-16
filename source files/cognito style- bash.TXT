@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# === Configuration ===
+USER_POOL_ID="us-east-1_PTG0MvHKY"
+CLIENT_ID="603h9cilpbhun5b0hgp2eaa8t5"
+REGION="us-east-1"
+
+CUSTOM_CSS="
+.background-customizable {
+  background-color: #e6f2ff;
+}
+.banner-customizable {
+  background-color: #3fbbc0;
+}
+"
+
+# === Apply the style ===
+echo "🎨 Applying minimal compliant style..."
+aws cognito-idp set-ui-customization \
+  --region "$REGION" \
+  --user-pool-id "$USER_POOL_ID" \
+  --client-id "$CLIENT_ID" \
+  --css "$CUSTOM_CSS"
+
+echo "✅ Compliant style successfully applied to Cognito Hosted UI!"

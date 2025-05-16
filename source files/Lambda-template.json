@@ -4,7 +4,7 @@
     "SyncUserToDynamo": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
-        "FunctionName": "SyncUserToDynamo",
+        "FunctionName": "CognitoUserToDynamo",
         "Handler": "index.handler",
         "Runtime": "nodejs18.x",
         "Role": {
@@ -19,8 +19,8 @@
                 "const docClient = new AWS.DynamoDB.DocumentClient();",
                 "",
                 "exports.handler = async (event) => {",
-                "  const email = event.email;",
-                "  const fullName = event.fullName;",
+                "  const email = event.request.userAttributes.email;",
+                "  const fullName = `${event.request.userAttributes.name} ${event.request.userAttributes.family_name}`.trim();",
                 "",
                 "  const params = {",
                 "    TableName: 'Users',",
@@ -39,7 +39,7 @@
                 "    }).promise();",
                 "  }",
                 "",
-                "  return { statusCode: 200, body: 'User synced' };",
+                "  return event;",
                 "};"
               ]
             ]

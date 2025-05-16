@@ -24,6 +24,7 @@
     "Users": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
+        "TableName": "Users",
         "AttributeDefinitions": [
           {
             "AttributeName": "email",
