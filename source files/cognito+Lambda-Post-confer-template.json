@@ -1,0 +1,194 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "UserPoolTriggerLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "CognitoUserToDynamo",
+        "Handler": "index.handler",
+        "Runtime": "nodejs18.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "import { DynamoDBClient } from \"@aws-sdk/client-dynamodb\";",
+                "import { DynamoDBDocumentClient, PutCommand } from \"@aws-sdk/lib-dynamodb\";",
+                "",
+                "const client = new DynamoDBClient({});",
+                "const dynamoDb = DynamoDBDocumentClient.from(client);",
+                "",
+                "export const handler = async (event) => {",
+                "  console.log(\"Event:\", JSON.stringify(event, null, 2));",
+                "",
+                "  try {",
+                "    const userAttributes = event.request.userAttributes;",
+                "    const username = event.userName;",
+                "",
+                "    if (!userAttributes.sub || !userAttributes.email || !userAttributes.name || !userAttributes.family_name || !username) {",
+                "      console.error(\"Missing required user attributes or username\");",
+                "      return event;",
+                "    }",
+                "",
+                "    const newUser = {",
+                "      userId: userAttributes.sub,",
+                "      email: userAttributes.email,",
+                "      name: userAttributes.name,",
+                "      family_name: userAttributes.family_name,",
+                "      username: username,",
+                "      bookedFlights: []",
+                "    };",
+                "",
+                "    const params = {",
+                "      TableName: \"Users\",",
+                "      Item: newUser",
+                "    };",
+                "",
+                "    await dynamoDb.send(new PutCommand(params));",
+                "    console.log(\"✅ User added to DynamoDB:\", newUser);",
+                "",
+                "    return event;",
+                "  } catch (error) {",
+                "    console.error(\"❌ Error inserting user to DynamoDB:\", error);",
+                "    throw error;",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": "CloudTripUserPool",
+        "UsernameConfiguration": { "CaseSensitive": false },
+        "UsernameAttributes": [ "email" ],
+        "AutoVerifiedAttributes": [ "email" ],
+        "LambdaConfig": {
+          "PostConfirmation": { "Fn::GetAtt": [ "UserPoolTriggerLambda", "Arn" ] }
+        },
+        "Schema": [
+          {
+            "Name": "email",
+            "Required": true,
+            "Mutable": true
+          },
+          {
+            "Name": "name",
+            "Required": true,
+            "Mutable": true
+          },
+          {
+            "Name": "family_name",
+            "Required": true,
+            "Mutable": true
+          }
+        ],
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8,
+            "RequireUppercase": true,
+            "RequireLowercase": true,
+            "RequireNumbers": true,
+            "RequireSymbols": false
+          }
+        },
+        "AdminCreateUserConfig": {
+          "AllowAdminCreateUserOnly": false
+        },
+        "AccountRecoverySetting": {
+          "RecoveryMechanisms": [
+            {
+              "Name": "verified_email",
+              "Priority": 1
+            }
+          ]
+        }
+      }
+    },
+
+    "UserPoolClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": "CloudTripClient",
+        "UserPoolId": { "Ref": "UserPool" },
+        "GenerateSecret": false,
+        "ExplicitAuthFlows": [
+          "ALLOW_USER_PASSWORD_AUTH",
+          "ALLOW_USER_SRP_AUTH",
+          "ALLOW_REFRESH_TOKEN_AUTH",
+          "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+          "ALLOW_CUSTOM_AUTH",
+          "ALLOW_USER_AUTH"
+        ],
+        "SupportedIdentityProviders": [ "COGNITO" ],
+        "CallbackURLs": [ "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html" ],
+        "LogoutURLs": [ "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html" ],
+        "AllowedOAuthFlows": [ "code" ],
+        "AllowedOAuthScopes": [ "openid", "email", "profile" ],
+        "AllowedOAuthFlowsUserPoolClient": true,
+        "AccessTokenValidity": 60,
+        "IdTokenValidity": 60,
+        "RefreshTokenValidity": 5,
+        "TokenValidityUnits": {
+          "AccessToken": "minutes",
+          "IdToken": "minutes",
+          "RefreshToken": "days"
+        },
+        "PreventUserExistenceErrors": "ENABLED"
+      }
+    },
+
+    "UserGroupAdmins": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "Admins",
+        "UserPoolId": { "Ref": "UserPool" },
+        "Description": "Admin group for CloudTrip",
+        "RoleArn": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        }
+      }
+    },
+
+    "UserPoolDomain": {
+      "Type": "AWS::Cognito::UserPoolDomain",
+      "Properties": {
+        "Domain": "cloudtripuserpool",
+        "UserPoolId": { "Ref": "UserPool" }
+      }
+    }
+  },
+
+  "Outputs": {
+    "UserPoolId": {
+      "Description": "Change in auth.js",
+      "Value": { "Ref": "UserPool" }
+    },
+    "UserPoolClientId": {
+      "Description": "Change in auth.js",
+      "Value": { "Ref": "UserPoolClient" }
+    },
+    "HostedUIDomain": {
+      "Value": {
+        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com"
+      }
+    },
+    "HostedUILoginURL": {
+      "Description": "Link to Hosted Login Page",
+      "Value": {
+        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
+      }
+    },
+    "ManualSetupInstructions": {
+      "Description": "Manual step: Configure Managed Login Style in Cognito Console",
+      "Value": "1. Go to Cognito → User Pool → Managed Login\n2. Click 'Create Style' and assign to CloudTripClient\n3. Customize branding (optional)"
+    }
+  }
+}

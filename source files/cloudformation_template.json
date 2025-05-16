@@ -4,7 +4,7 @@
     "StaticWebsiteBucket": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
-        "BucketName": "cloudtrip",
+        "BucketName": "cloudtrip2",
         "WebsiteConfiguration": {
           "IndexDocument": "index.html",
           "ErrorDocument": "index.html"
@@ -12,8 +12,8 @@
         "CorsConfiguration": {
           "CorsRules": [
             {
-              "AllowedHeaders": ["*"],
-              "AllowedMethods": ["GET", "PUT", "POST"],
+              "AllowedHeaders": [ "*" ],
+              "AllowedMethods": [ "GET", "PUT", "POST" ],
               "AllowedOrigins": [
                 "https://czohwpuhzi.execute-api.us-east-1.amazonaws.com/prod",
                 "http://cloudtrip.s3.us-east-1.amazonaws.com"
@@ -29,6 +29,7 @@
         }
       }
     },
+
     "BucketPolicy": {
       "Type": "AWS::S3::BucketPolicy",
       "Properties": {
@@ -55,6 +56,111 @@
           ]
         }
       }
+    },
+
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "UserPoolName": "CloudTripUserPool",
+        "UsernameConfiguration": {
+          "CaseSensitive": false
+        },
+        "UsernameAttributes": [ "email" ],
+        "AutoVerifiedAttributes": [ "email" ],
+        "Schema": [
+          {
+            "Name": "email",
+            "Required": true,
+            "Mutable": true
+          },
+          {
+            "Name": "name",
+            "Required": true,
+            "Mutable": true
+          },
+          {
+            "Name": "family_name",
+            "Required": true,
+            "Mutable": true
+          }
+        ],
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8,
+            "RequireUppercase": true,
+            "RequireLowercase": true,
+            "RequireNumbers": true,
+            "RequireSymbols": false
+          }
+        },
+        "AdminCreateUserConfig": {
+          "AllowAdminCreateUserOnly": false
+        },
+        "AccountRecoverySetting": {
+          "RecoveryMechanisms": [
+            {
+              "Name": "verified_email",
+              "Priority": 1
+            }
+          ]
+        }
+      }
+    },
+
+    "UserPoolClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "ClientName": "CloudTripClient",
+        "UserPoolId": { "Ref": "UserPool" },
+        "GenerateSecret": false,
+        "ExplicitAuthFlows": [
+          "ALLOW_USER_PASSWORD_AUTH",
+          "ALLOW_USER_SRP_AUTH",
+          "ALLOW_REFRESH_TOKEN_AUTH",
+          "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+          "ALLOW_CUSTOM_AUTH",
+          "ALLOW_USER_AUTH"
+        ],
+        "SupportedIdentityProviders": [ "COGNITO" ],
+        "CallbackURLs": [
+          "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
+        ],
+        "LogoutURLs": [
+          "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
+        ],
+        "AccessTokenValidity": 60,
+        "IdTokenValidity": 60,
+        "RefreshTokenValidity": 5,
+        "TokenValidityUnits": {
+          "AccessToken": "minutes",
+          "IdToken": "minutes",
+          "RefreshToken": "days"
+        },
+        "PreventUserExistenceErrors": "ENABLED"
+      }
+    },
+
+    "UserGroupAdmins": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "Admins",
+        "UserPoolId": { "Ref": "UserPool" },
+        "Description": "Admin group for CloudTrip"
+      }
+    }
+  },
+
+  "Outputs": {
+    "S3WebsiteURL": {
+      "Value": {
+        "Fn::GetAtt": [ "StaticWebsiteBucket", "WebsiteURL" ]
+      }
+    },
+    "UserPoolId": {
+      "Value": { "Ref": "UserPool" }
+    },
+    "UserPoolClientId": {
+      "Value": { "Ref": "UserPoolClient" }
     }
   }
 }
