@@ -4,7 +4,7 @@
     "StaticWebsiteBucket": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
-        "BucketName": "cloudtrip2",
+        "BucketName": "cloudtrip3",
         "WebsiteConfiguration": {
           "IndexDocument": "index.html",
           "ErrorDocument": "index.html"
@@ -16,7 +16,7 @@
               "AllowedMethods": [ "GET", "PUT", "POST" ],
               "AllowedOrigins": [
                 "https://czohwpuhzi.execute-api.us-east-1.amazonaws.com/prod",
-                "http://cloudtrip.s3.us-east-1.amazonaws.com"
+                "http://cloudtrip3.s3.us-east-1.amazonaws.com"
               ]
             }
           ]

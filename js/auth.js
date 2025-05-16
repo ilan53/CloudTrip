@@ -1,10 +1,10 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_XPh2lrwwm',
-  ClientId: '442frlnoo8vjap3dfhv005unh7',
+  UserPoolId: 'us-east-1_ShVX2senh',
+  ClientId: '2he71d8v8fodr3q2ek87kuheub',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
-  redirectUri: 'https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html'
+  redirectUri: 'https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html'
 };
 
 document.addEventListener('DOMContentLoaded', function () {
