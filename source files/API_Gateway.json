@@ -1,0 +1,65 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "FlightApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "FlightApi",
+        "ProtocolType": "HTTP"
+      }
+    },
+    "FlightApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": { "Ref": "FlightApi" },
+        "StageName": "prod",
+        "AutoDeploy": true
+      }
+    },
+    "GetSearchFlightsIntegration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": { "Ref": "FlightApi" },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": "arn:aws:lambda:us-east-1:286801031611:function:getSearchFlights",
+        "PayloadFormatVersion": "2.0",
+        "IntegrationMethod": "POST"
+      }
+    },
+    "GetSearchFlightsRoute": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": { "Ref": "FlightApi" },
+        "RouteKey": "GET /Flight/getsearchflight",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              { "Ref": "GetSearchFlightsIntegration" }
+            ]
+          ]
+        }
+      }
+    },
+    "GetSearchFlightsPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "getSearchFlights",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${FlightApi}/*/GET/Flight/getsearchflight"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "GetSearchFlightsApiEndpoint": {
+      "Description": "GET endpoint for searching flights",
+      "Value": {
+        "Fn::Sub": "https://${FlightApi}.execute-api.${AWS::Region}.amazonaws.com/prod/Flight/getsearchflight"
+      }
+    }
+  }
+}

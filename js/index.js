@@ -1,4 +1,4 @@
-const API_ENDPOINT_SEARCH_FLIGHTS = "https://your-api-id.execute-api.region.amazonaws.com/prod/getsearchflights";
+const API_ENDPOINT_SEARCH_FLIGHTS = "https://1z6pdnnb4h.execute-api.us-east-1.amazonaws.com/prod/getsearchflights";
 
 const cities = [
   "New York", "Los Angeles", "San Francisco", "London", "Paris", "Tokyo",
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const from = document.getElementById("from").value;
     const to = document.getElementById("to").value;
     const departureDate = document.getElementById("departure-date").value;
-    const returnDate = document.getElementById("return-date").value;
+    /*const returnDate = document.getElementById("return-date").value;?*/
     const passengers = document.getElementById("passengers").value;
     const flightClass = document.getElementById("flight-class").value;
 
