@@ -3,6 +3,7 @@
     "Flights": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
+        "TableName": "Flights",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",

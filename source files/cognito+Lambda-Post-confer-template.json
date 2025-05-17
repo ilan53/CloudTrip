@@ -15,13 +15,13 @@
             "Fn::Join": [
               "\n",
               [
-                "import { DynamoDBClient } from \"@aws-sdk/client-dynamodb\";",
-                "import { DynamoDBDocumentClient, PutCommand } from \"@aws-sdk/lib-dynamodb\";",
+                "const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");",
+                "const { DynamoDBDocumentClient, PutCommand } = require(\"@aws-sdk/lib-dynamodb\");",
                 "",
                 "const client = new DynamoDBClient({});",
                 "const dynamoDb = DynamoDBDocumentClient.from(client);",
                 "",
-                "export const handler = async (event) => {",
+                "exports.handler = async (event) => {",
                 "  console.log(\"Event:\", JSON.stringify(event, null, 2));",
                 "",
                 "  try {",
@@ -128,8 +128,8 @@
           "ALLOW_USER_AUTH"
         ],
         "SupportedIdentityProviders": [ "COGNITO" ],
-        "CallbackURLs": [ "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html" ],
-        "LogoutURLs": [ "https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html" ],
+        "CallbackURLs": [ "https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html" ],
+        "LogoutURLs": [ "https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html" ],
         "AllowedOAuthFlows": [ "code" ],
         "AllowedOAuthScopes": [ "openid", "email", "profile" ],
         "AllowedOAuthFlowsUserPoolClient": true,
@@ -183,7 +183,7 @@
     "HostedUILoginURL": {
       "Description": "Link to Hosted Login Page",
       "Value": {
-        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip2.s3.us-east-1.amazonaws.com/index.html"
+        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html"
       }
     },
     "ManualSetupInstructions": {
