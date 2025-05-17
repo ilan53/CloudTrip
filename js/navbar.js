@@ -1,4 +1,3 @@
-// Function to create the navigation bar
 function createNavbar() {
   const navbar = `
     <div class="logo">
@@ -9,7 +8,11 @@ function createNavbar() {
         <li><a href="../index.html">Home</a></li>
         <li><a href="mostVisited.html">Most Visited</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li><a href="#" class="btn-login" onclick="signIn()">Login</a></li>
+        <li id="adminCheck" class="d-none"><a href="admin.html">Admin Panel</a></li>
+        <li id="authContainer">
+          <span id="userGreeting" class="d-none me-2"></span>
+          <a href="#" id="authButton" class="btn-login">Login</a>
+        </li>
         <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
       </ul>
     </nav>
@@ -21,7 +24,4 @@ function createNavbar() {
   }
 }
 
-// Initialize navbar when DOM is loaded
-document.addEventListener('DOMContentLoaded', function () {
-  createNavbar();
-});
+document.addEventListener('DOMContentLoaded', createNavbar);

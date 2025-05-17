@@ -134,11 +134,8 @@ function updateAuthUI(username, userGroup) {
   const userGreeting = document.getElementById('userGreeting');
   const authButton = document.getElementById('authButton');
   const adminPage = document.getElementById('adminCheck');
-  const createChef = document.getElementById('createChef');
   const authContainer = document.getElementById('authContainer');
-
-  // השבתה זמנית אם האלמנטים לא קיימים
-  if (!userGreeting || !authButton || !adminPage || !createChef || !authContainer) {
+  if (!userGreeting || !authButton || !adminPage || !authContainer) {
     console.log("⏸️ UI update skipped — elements not found in DOM");
     return;
   }
@@ -148,23 +145,22 @@ function updateAuthUI(username, userGroup) {
     userGreeting.classList.remove('d-none');
     authButton.textContent = 'Sign Out';
     authButton.onclick = signOut;
-    authButton.classList.remove('btn-primary');
+    authButton.classList.remove('btn-login');
     authButton.classList.add('btn-danger');
 
     adminPage.classList.toggle('d-none', userGroup !== 'Admin');
-    createChef.classList.toggle('d-none', userGroup !== 'ChefUser');
   } else {
     userGreeting.textContent = '';
     userGreeting.classList.add('d-none');
-    authButton.textContent = 'Sign In';
+    authButton.textContent = 'Login';
     authButton.onclick = signIn;
     authButton.classList.remove('btn-danger');
-    authButton.classList.add('btn-primary');
+    authButton.classList.add('btn-login');
 
     adminPage.classList.add('d-none');
-    createChef.classList.add('d-none');
   }
 
   authContainer.classList.remove('d-none');
 }
+
 

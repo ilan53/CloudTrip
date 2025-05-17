@@ -5,7 +5,12 @@
       "Type": "AWS::ApiGatewayV2::Api",
       "Properties": {
         "Name": "FlightApi",
-        "ProtocolType": "HTTP"
+        "ProtocolType": "HTTP",
+        "CorsConfiguration": {
+          "AllowMethods": [ "GET", "OPTIONS" ],
+          "AllowOrigins": [ "*" ],
+          "AllowHeaders": [ "*" ]
+        }
       }
     },
     "FlightApiStage": {
@@ -21,7 +26,9 @@
       "Properties": {
         "ApiId": { "Ref": "FlightApi" },
         "IntegrationType": "AWS_PROXY",
-        "IntegrationUri": "arn:aws:lambda:us-east-1:286801031611:function:getSearchFlights",
+        "IntegrationUri": {
+          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getSearchFlights"
+        },
         "PayloadFormatVersion": "2.0",
         "IntegrationMethod": "POST"
       }
