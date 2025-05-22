@@ -1,0 +1,249 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "GetFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "getFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async () => {",
+                "  try {",
+                "    const result = await docClient.scan({ TableName: TABLE_NAME }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify(result.Items)",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "       headers: {'Access-Control-Allow-Origin': '*'},",
+                "      body: JSON.stringify({ error: 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "PutFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "putFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const updatedFlight = JSON.parse(event.body);",
+                "    await docClient.put({",
+                "      TableName: TABLE_NAME,",
+                "      Item: updatedFlight",
+                "    }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Content-Type': 'application/json',",
+                "        'Access-Control-Allow-Origin': '*'",
+                "      },",
+                "      body: JSON.stringify({ message: 'Flight updated successfully' })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "PostFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "postFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const flight = JSON.parse(event.body);",
+                "    const id = `${flight.flightNumber}-${flight.date}-${flight.time}`;",
+                "    const item = { ...flight, id };",
+                "    await docClient.put({ TableName: TABLE_NAME, Item: item }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ message: 'Flight added successfully', id })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "DeleteFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "deleteFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    let id;",
+                "    if (event.pathParameters && event.pathParameters.id) {",
+                "      id = event.pathParameters.id;",
+                "    } else {",
+                "      const body = JSON.parse(event.body || '{}');",
+                "      id = body.id;",
+                "    }",
+                "",
+                "    if (!id) throw new Error('Missing flight ID');",
+                "",
+                "    await docClient.delete({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { id }",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Content-Type': 'application/json',",
+                "        'Access-Control-Allow-Origin': '*'",
+                "      },",
+                "      body: JSON.stringify({ message: 'Flight deleted successfully', id })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "GetFlightsLambdaName": {
+      "Description": "Lambda Function Name - getFlights",
+      "Value": {
+        "Ref": "GetFlightsLambda"
+      }
+    },
+    "GetFlightsLambdaArn": {
+      "Description": "Lambda ARN - getFlights",
+      "Value": {
+        "Fn::GetAtt": [
+          "GetFlightsLambda",
+          "Arn"
+        ]
+      }
+    },
+    "PutFlightsLambdaName": {
+      "Description": "Lambda Function Name - putFlights",
+      "Value": {
+        "Ref": "PutFlightsLambda"
+      }
+    },
+    "PutFlightsLambdaArn": {
+      "Description": "Lambda ARN - putFlights",
+      "Value": {
+        "Fn::GetAtt": [
+          "PutFlightsLambda",
+          "Arn"
+        ]
+      }
+    },
+    "PostFlightsLambdaName": {
+      "Description": "Lambda Function Name - postFlights",
+      "Value": {
+        "Ref": "PostFlightsLambda"
+      }
+    },
+    "PostFlightsLambdaArn": {
+      "Description": "Lambda ARN - postFlights",
+      "Value": {
+        "Fn::GetAtt": [
+          "PostFlightsLambda",
+          "Arn"
+        ]
+      }
+    },
+    "DeleteFlightsLambdaName": {
+      "Value": { "Ref": "DeleteFlightsLambda" }
+    },
+    "DeleteFlightsLambdaArn": {
+      "Value": { "Fn::GetAtt": [ "DeleteFlightsLambda", "Arn" ] }
+    }
+  }
+}

@@ -2,7 +2,7 @@ const fs = require('fs');
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
-const TABLE_NAME = 'DynamoFlights-Flights-XW9V1JY3U3QK';
+const TABLE_NAME = 'Flights';
 const REGION = 'us-east-1'; // שנה לפי האזור שלך אם צריך
 
 const client = new DynamoDBClient({ region: REGION });

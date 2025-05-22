@@ -1,0 +1,70 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "PutFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "putFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const updatedFlight = JSON.parse(event.body);",
+                "    await docClient.put({",
+                "      TableName: TABLE_NAME,",
+                "      Item: updatedFlight",
+                "    }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Content-Type': 'application/json',",
+                "        'Access-Control-Allow-Origin': '*'",
+                "      },",
+                "      body: JSON.stringify({ message: 'Flight updated successfully' })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaFunctionName": {
+      "Description": "Lambda Function Name",
+      "Value": {
+        "Ref": "PutFlightsLambda"
+      }
+    },
+    "LambdaFunctionArn": {
+      "Description": "Lambda ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "PutFlightsLambda",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

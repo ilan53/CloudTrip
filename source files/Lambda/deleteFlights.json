@@ -1,0 +1,80 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "DeleteFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "deleteFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    let id;",
+                "    if (event.pathParameters && event.pathParameters.id) {",
+                "      id = event.pathParameters.id;",
+                "    } else {",
+                "      const body = JSON.parse(event.body || '{}');",
+                "      id = body.id;",
+                "    }",
+                "",
+                "    if (!id) throw new Error('Missing flight ID');",
+                "",
+                "    await docClient.delete({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { id }",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Content-Type': 'application/json',",
+                "        'Access-Control-Allow-Origin': '*'",
+                "      },",
+                "      body: JSON.stringify({ message: 'Flight deleted successfully', id })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaFunctionName": {
+      "Description": "Lambda Function Name",
+      "Value": {
+        "Ref": "DeleteFlightsLambda"
+      }
+    },
+    "LambdaFunctionArn": {
+      "Description": "Lambda ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "DeleteFlightsLambda",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

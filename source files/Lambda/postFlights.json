@@ -1,0 +1,66 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "PostFlightsLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "postFlights",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Flights';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const flight = JSON.parse(event.body);",
+                "    const id = `${flight.flightNumber}-${flight.date}-${flight.time}`;",
+                "    const item = { ...flight, id };",
+                "    await docClient.put({ TableName: TABLE_NAME, Item: item }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ message: 'Flight added successfully', id })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaFunctionName": {
+      "Description": "Lambda Function Name",
+      "Value": {
+        "Ref": "PostFlightsLambda"
+      }
+    },
+    "LambdaFunctionArn": {
+      "Description": "Lambda ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "PostFlightsLambda",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

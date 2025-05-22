@@ -1,0 +1,148 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: #f4f6f9;
+    color: #333;
+}
+
+main {
+    max-width: 90%;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.toggle-buttons {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.toggle-buttons button {
+    background: #0078d4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.toggle-buttons button:hover {
+    background: #005a9e;
+}
+
+.form-container {
+    margin: 30px auto;
+    padding: 20px;
+    border: 1px solid #d0d0d0;
+    border-radius: 10px;
+    background: #f9f9f9;
+    max-width: 800px;
+}
+
+.form-container input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.form-container button {
+    padding: 10px 16px;
+    margin-right: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.form-container button[type="button"] {
+    background: #dc3545;
+}
+
+input#flight-search {
+    width: 40%;
+    margin: 20px auto;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    display: block;
+    font-size: 16px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.data-table th {
+    background: #0078d4;
+    color: white;
+}
+
+.data-table tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+.data-table button {
+    padding: 6px 12px;
+    margin: 0 2px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.data-table button:hover {
+    background: #005a9e;
+}
+
+.pagination-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination-container button {
+    margin: 0 4px;
+    padding: 8px 14px;
+    background: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.pagination-container button:hover {
+    background: #0078d4;
+    color: white;
+}
+
+.data-table-container {
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 20px;
+}

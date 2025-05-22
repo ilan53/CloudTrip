@@ -1,72 +1,280 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Resources": {
-    "FlightApi": {
-      "Type": "AWS::ApiGatewayV2::Api",
+    "RestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "FlightApi",
-        "ProtocolType": "HTTP",
-        "CorsConfiguration": {
-          "AllowMethods": [ "GET", "OPTIONS" ],
-          "AllowOrigins": [ "*" ],
-          "AllowHeaders": [ "*" ]
-        }
+        "Name": "FlightsApi"
       }
     },
-    "FlightApiStage": {
-      "Type": "AWS::ApiGatewayV2::Stage",
+
+    "RestApiDeployment": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "DependsOn": [ "FlightsGetMethod", "FlightsPostMethod", "FlightsPutMethod", "FlightsDeleteMethod", "FlightsOptionsMethod" ],
       "Properties": {
-        "ApiId": { "Ref": "FlightApi" },
-        "StageName": "prod",
-        "AutoDeploy": true
+        "RestApiId": { "Ref": "RestApi" },
+        "StageName": "prod"
       }
     },
-    "GetSearchFlightsIntegration": {
-      "Type": "AWS::ApiGatewayV2::Integration",
+
+    "FlightsResource": {
+      "Type": "AWS::ApiGateway::Resource",
       "Properties": {
-        "ApiId": { "Ref": "FlightApi" },
-        "IntegrationType": "AWS_PROXY",
-        "IntegrationUri": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getSearchFlights"
+        "RestApiId": { "Ref": "RestApi" },
+        "ParentId": {
+          "Fn::GetAtt": [ "RestApi", "RootResourceId" ]
         },
-        "PayloadFormatVersion": "2.0",
-        "IntegrationMethod": "POST"
+        "PathPart": "flights"
       }
     },
-    "GetSearchFlightsRoute": {
-      "Type": "AWS::ApiGatewayV2::Route",
+
+    "FlightsGetMethod": {
+      "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "ApiId": { "Ref": "FlightApi" },
-        "RouteKey": "GET /Flight/getsearchflight",
-        "Target": {
-          "Fn::Join": [
-            "/",
-            [
-              "integrations",
-              { "Ref": "GetSearchFlightsIntegration" }
-            ]
-          ]
-        }
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "FlightsResource" },
+        "HttpMethod": "GET",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getFlights/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
       }
     },
-    "GetSearchFlightsPermission": {
+
+    "FlightsPostMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "FlightsResource" },
+        "HttpMethod": "POST",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:postFlights/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "FlightsPutMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "FlightsResource" },
+        "HttpMethod": "PUT",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putFlights/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "FlightsDeleteMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "FlightsResource" },
+        "HttpMethod": "DELETE",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:deleteFlights/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+
+
+    "FlightsOptionsMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "FlightsResource" },
+        "HttpMethod": "OPTIONS",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseTemplates": {
+                "application/json": ""
+              },
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "LambdaInvokePermissionGet": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "FunctionName": "getSearchFlights",
+        "FunctionName": "getFlights",
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
-          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${FlightApi}/*/GET/Flight/getsearchflight"
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/GET/flights"
+        }
+      }
+    },
+
+    "LambdaInvokePermissionPost": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "postFlights",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/POST/flights"
+        }
+      }
+    },
+
+    "LambdaInvokePermissionPut": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "putFlights",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/PUT/flights"
+        }
+      }
+    },
+
+    "LambdaInvokePermissionDelete": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "deleteFlights",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/DELETE/flights"
         }
       }
     }
   },
   "Outputs": {
-    "GetSearchFlightsApiEndpoint": {
-      "Description": "GET endpoint for searching flights",
+    "ApiId": {
+      "Value": { "Ref": "RestApi" },
+      "Description": "API Gateway ID"
+    },
+    "ApiInvokeUrl": {
       "Value": {
-        "Fn::Sub": "https://${FlightApi}.execute-api.${AWS::Region}.amazonaws.com/prod/Flight/getsearchflight"
-      }
+        "Fn::Sub": "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/flights"
+      },
+      "Description": "Public invoke URL for /flights endpoint"
     }
   }
 }
