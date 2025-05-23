@@ -37,31 +37,12 @@
     </div>
     
         <input type="text" id="flight-search" placeholder="Search flightNumber..." />
-        <div id="data-container"></div>
+        <div class="table-wrapper">
+            <div id="data-container"></div>
+        </div>
+
         <div id="pagination-container" class="pagination-container"></div>
         
-    <div id="pagination-container" class="pagination-container"></div>
-    
-        <div class="form-container" id="flight-form-container" style="display:none;">
-            <h3 id="form-title">Add Flight</h3>
-            <form id="flight-form">
-                <input type="hidden" id="flight-id" />
-                <label>From: <input type="text" id="from" required /></label><br/>
-                <label>To: <input type="text" id="to" required /></label><br/>
-                <label>Date: <input type="date" id="date" required /></label><br/>
-                <label>Time: <input type="time" id="time" required /></label><br/>
-                <label>Flight Number: <input type="text" id="flightNumber" required /></label><br/>
-                <label>Operator: <input type="text" id="operator" required /></label><br/>
-                <label>Price: <input type="number" id="price" required /></label><br/>
-                <label>Duration Minutes: <input type="number" id="durationMinutes" required /></label><br/>
-                <label>Stops: <input type="number" id="stops" required /></label><br/>
-                <label>Aircraft: <input type="text" id="aircraft" required /></label><br/>
-                <label>Available Seats: <input type="number" id="availableSeats" required /></label><br/>
-                <label>Class Options: <input type="text" id="classOptions" required /></label><br/>
-                <button type="submit">Submit</button>
-                <button type="button" onclick="closeFlightForm()">Cancel</button>
-            </form>
-        </div>
     </main>
 
     <footer>

@@ -1,0 +1,66 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "GetUsersLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "getUsers",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async () => {",
+                "  try {",
+                "    const result = await docClient.scan({ TableName: TABLE_NAME }).promise();",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Content-Type': 'application/json',",
+                "        'Access-Control-Allow-Origin': '*'",
+                "      },",
+                "      body: JSON.stringify(result.Items)",
+                "    };",
+                "  } catch (err) {",
+                "    console.error(err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaFunctionName": {
+      "Description": "Lambda Function Name",
+      "Value": {
+        "Ref": "GetUsersLambda"
+      }
+    },
+    "LambdaFunctionArn": {
+      "Description": "Lambda ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "GetUsersLambda",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

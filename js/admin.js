@@ -1,8 +1,15 @@
-const FLIGHTS_API = "https://o5daammhw0.execute-api.us-east-1.amazonaws.com/prod/flights"; 
-const USERS_API = "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/users";    
+const API = "https://zj4wtxk6m5.execute-api.us-east-1.amazonaws.com/prod/";
+const FLIGHTS_API = API + "flights"; 
+const USERS_API = API + "users";
+
+let currentData = [];
+let currentPage = 1;
+const itemsPerPage = 10;
+let currentTableType = "flights"; 
 
 async function loadFlights() {
     try {
+        document.getElementById("flight-search").style.display = "block";
         const res = await fetch(FLIGHTS_API);
         const data = await res.json();
         const flights = Array.isArray(data) ? data : JSON.parse(data.body);
@@ -14,6 +21,8 @@ async function loadFlights() {
 
 async function loadUsers() {
     try {
+        document.getElementById("flight-search").style.display = "none";
+        currentPage = 1;
         const res = await fetch(USERS_API);
         const data = await res.json();
         const users = Array.isArray(data) ? data : JSON.parse(data.body);
@@ -24,6 +33,8 @@ async function loadUsers() {
 }
 
 function renderTable(items, type) {
+    currentData = items;
+    currentTableType = type;
     const container = document.getElementById("data-container");
     container.innerHTML = "";
 
@@ -32,20 +43,47 @@ function renderTable(items, type) {
         return;
     }
 
-    let headers = Object.keys(items[0]);
+    let headers;
+    if (type === "users") {
+        headers = ["userId", "username", "email", "name", "family_name", "bookedFlights"];
+    } else {
+        headers = Object.keys(items[0]);
+    }
+
     let table = "<table class='data-table'><thead><tr>";
+
+    // Render column headers
     headers.forEach(h => table += `<th>${h}</th>`);
+    if (type === "flights") {
+        table += "<th>Actions</th>";  // Add actions column only for flights
+    }
     table += "</tr></thead><tbody>";
-    items.forEach(item => {
+
+    // Render table rows
+    const visibleItems = paginate(items, currentPage);
+    visibleItems.forEach(item => {
         table += "<tr>";
         headers.forEach(h => {
             table += `<td>${item[h]}</td>`;
         });
+
+        // Add buttons only for flights
+        if (type === "flights") {
+            table += `<td>
+                <button onclick='editFlight(${JSON.stringify(item)})'>Edit</button>
+                <button onclick='deleteFlight("${item.id}")'>Delete</button>
+            </td>`;
+        }
+
         table += "</tr>";
     });
+
     table += "</tbody></table>";
     container.innerHTML = table;
+
+    renderPagination(items.length);
 }
+
 function showAddFlightForm() {
     document.getElementById('form-title').textContent = "Add Flight";
     document.getElementById('flight-form').reset();
@@ -91,30 +129,7 @@ document.getElementById('flight-form').addEventListener('submit', async (e) => {
     }
 });
 
-function renderTable(items, type) {
-    const container = document.getElementById("data-container");
-    container.innerHTML = "";
 
-    if (!items.length) {
-        container.innerHTML = "<p>No data found.</p>";
-        return;
-    }
-
-    let headers = Object.keys(items[0]);
-    let table = "<table class='data-table'><thead><tr>";
-    headers.forEach(h => table += `<th>${h}</th>`);
-    table += "<th>Actions</th></tr></thead><tbody>";
-    items.forEach(item => {
-        table += "<tr>";
-        headers.forEach(h => {
-            table += `<td>${item[h]}</td>`;
-        });
-        table += `<td><button onclick='editFlight(${JSON.stringify(item)})'>Edit</button> <button onclick='deleteFlight("${item.id}")'>Delete</button></td>`;
-        table += "</tr>";
-    });
-    table += "</tbody></table>";
-    container.innerHTML = table;
-}
 
 function editFlight(flight) {
     document.getElementById('form-title').textContent = "Edit Flight";
@@ -125,11 +140,6 @@ function editFlight(flight) {
     });
     document.getElementById('flight-form-container').style.display = 'block';
 }
-
-
-let currentPage = 1;
-const itemsPerPage = 10;
-let currentData = [];
 
 function paginate(data, page) {
     const start = (page - 1) * itemsPerPage;
@@ -147,43 +157,11 @@ function renderPagination(totalItems) {
         btn.textContent = i;
         btn.onclick = () => {
             currentPage = i;
-            renderTable(currentData, "flights");
+            renderTable(currentData, currentTableType);
         };
         container.appendChild(btn);
     }
 }
-
-function renderTable(items, type) {
-    currentData = items;
-    const container = document.getElementById("data-container");
-    container.innerHTML = "";
-
-    if (!items.length) {
-        container.innerHTML = "<p>No data found.</p>";
-        return;
-    }
-
-    let headers = Object.keys(items[0]);
-    let table = "<table class='data-table'><thead><tr>";
-    headers.forEach(h => table += `<th>${h}</th>`);
-    table += "<th>Actions</th></tr></thead><tbody>";
-
-    const visibleItems = paginate(items, currentPage);
-    visibleItems.forEach(item => {
-        table += "<tr>";
-        headers.forEach(h => {
-            table += `<td>${item[h]}</td>`;
-        });
-        table += `<td><button onclick='editFlight(${JSON.stringify(item)})'>Edit</button> <button onclick='deleteFlight("${item.id}")'>Delete</button></td>`;
-        table += "</tr>";
-    });
-    table += "</tbody></table>";
-    container.innerHTML = table;
-
-    renderPagination(items.length);
-}
-
-
 
 
 function setupSearch() {
@@ -201,17 +179,6 @@ function setupSearch() {
         renderTable(filtered, "flights");
     });
 }
-
-function showFlights() {
-    document.getElementById("flight-form-container").style.display = "none";
-    loadFlights();
-}
-
-function showUsers() {
-    document.getElementById("flight-form-container").style.display = "none";
-    loadUsers();
-}
-
 
 async function deleteFlight(id) {
     if (!confirm("Are you sure you want to delete this flight?")) return;
@@ -232,8 +199,6 @@ async function deleteFlight(id) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    showFlights();     // Selects the "Show Flights" toggle by default
-    loadFlights();     // Loads all flights into the table
-    setupSearch();     // Enables live search on flightNumber
+    loadFlights();     
+    setupSearch();     
 });
-

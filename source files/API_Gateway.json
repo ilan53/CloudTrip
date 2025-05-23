@@ -7,32 +7,48 @@
         "Name": "FlightsApi"
       }
     },
-
     "RestApiDeployment": {
       "Type": "AWS::ApiGateway::Deployment",
-      "DependsOn": [ "FlightsGetMethod", "FlightsPostMethod", "FlightsPutMethod", "FlightsDeleteMethod", "FlightsOptionsMethod" ],
+      "DependsOn": [
+        "FlightsGetMethod",
+        "FlightsPostMethod",
+        "FlightsPutMethod",
+        "FlightsDeleteMethod",
+        "FlightsOptionsMethod",
+        "UsersGetMethod",
+        "UsersOptionsMethod"
+      ],
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
         "StageName": "prod"
       }
     },
-
     "FlightsResource": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
         "ParentId": {
-          "Fn::GetAtt": [ "RestApi", "RootResourceId" ]
+          "Fn::GetAtt": [
+            "RestApi",
+            "RootResourceId"
+          ]
         },
         "PathPart": "flights"
       }
     },
-
     "FlightsGetMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
-        "ResourceId": { "Ref": "FlightsResource" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "FlightsResource"
+        },
         "HttpMethod": "GET",
         "AuthorizationType": "NONE",
         "Integration": {
@@ -64,12 +80,15 @@
         ]
       }
     },
-
     "FlightsPostMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
-        "ResourceId": { "Ref": "FlightsResource" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "FlightsResource"
+        },
         "HttpMethod": "POST",
         "AuthorizationType": "NONE",
         "Integration": {
@@ -101,12 +120,15 @@
         ]
       }
     },
-
     "FlightsPutMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
-        "ResourceId": { "Ref": "FlightsResource" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "FlightsResource"
+        },
         "HttpMethod": "PUT",
         "AuthorizationType": "NONE",
         "Integration": {
@@ -138,12 +160,15 @@
         ]
       }
     },
-
     "FlightsDeleteMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
-        "ResourceId": { "Ref": "FlightsResource" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "FlightsResource"
+        },
         "HttpMethod": "DELETE",
         "AuthorizationType": "NONE",
         "Integration": {
@@ -175,14 +200,15 @@
         ]
       }
     },
-
-
-
     "FlightsOptionsMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "RestApiId": { "Ref": "RestApi" },
-        "ResourceId": { "Ref": "FlightsResource" },
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "FlightsResource"
+        },
         "HttpMethod": "OPTIONS",
         "AuthorizationType": "NONE",
         "Integration": {
@@ -216,7 +242,6 @@
         ]
       }
     },
-
     "LambdaInvokePermissionGet": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -228,7 +253,6 @@
         }
       }
     },
-
     "LambdaInvokePermissionPost": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -240,7 +264,6 @@
         }
       }
     },
-
     "LambdaInvokePermissionPut": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -252,7 +275,6 @@
         }
       }
     },
-
     "LambdaInvokePermissionDelete": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -263,18 +285,116 @@
           "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/DELETE/flights"
         }
       }
+    },
+    "UsersResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ParentId": {
+          "Fn::GetAtt": [
+            "RestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "users"
+      }
+    },
+    "UsersGetMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "UsersResource"
+        },
+        "HttpMethod": "GET",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getUsers/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+    "UsersOptionsMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "UsersResource"
+        },
+        "HttpMethod": "OPTIONS",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseTemplates": {
+                "application/json": ""
+              },
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+    "LambdaInvokePermissionGetUsers": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "getUsers",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/GET/users"
+        }
+      }
     }
   },
   "Outputs": {
     "ApiId": {
-      "Value": { "Ref": "RestApi" },
+      "Value": {
+        "Ref": "RestApi"
+      },
       "Description": "API Gateway ID"
     },
     "ApiInvokeUrl": {
       "Value": {
-        "Fn::Sub": "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/flights"
+        "Fn::Sub": "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
       },
-      "Description": "Public invoke URL for /flights endpoint"
+      "Description": "Public invoke URL"
     }
   }
 }
