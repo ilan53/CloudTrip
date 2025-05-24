@@ -16,6 +16,7 @@
         "FlightsDeleteMethod",
         "FlightsOptionsMethod",
         "UsersGetMethod",
+        "UsersPutMethod",
         "UsersOptionsMethod"
       ],
       "Properties": {
@@ -329,6 +330,42 @@
         ]
       }
     },
+    "UsersPutMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "UsersResource" },
+        "HttpMethod": "PUT",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putUsers/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
     "UsersOptionsMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
@@ -353,7 +390,7 @@
               },
               "ResponseParameters": {
                 "method.response.header.Access-Control-Allow-Headers": "'*'",
-                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Methods": "'GET,PUT,OPTIONS'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
@@ -379,6 +416,17 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/GET/users"
+        }
+      }
+    },
+    "LambdaInvokePermissionPutUsers": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "putUsers",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/PUT/users"
         }
       }
     }

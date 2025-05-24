@@ -1,7 +1,3 @@
-const API = "https://zj4wtxk6m5.execute-api.us-east-1.amazonaws.com/prod/";
-const FLIGHTS_API = API + "flights"; 
-const USERS_API = API + "users";
-
 let currentData = [];
 let currentPage = 1;
 const itemsPerPage = 10;
@@ -10,9 +6,7 @@ let currentTableType = "flights";
 async function loadFlights() {
     try {
         document.getElementById("flight-search").style.display = "block";
-        const res = await fetch(FLIGHTS_API);
-        const data = await res.json();
-        const flights = Array.isArray(data) ? data : JSON.parse(data.body);
+        const flights = await fetchFlights();
         renderTable(flights, "flights");
     } catch (err) {
         console.error("Error loading flights:", err);

@@ -149,3 +149,18 @@ form {
   font-weight: bold;
   color: #1a73e8; /* הצבע הסופי שיוצג */
 }
+
+#flight-info-row .form-group {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.highlight-box {
+  background-color: #e8f0fe;
+  border-radius: 6px;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #174ea6;
+  margin-top: 4px;
+}

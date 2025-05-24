@@ -96,6 +96,7 @@ function displayUserInfo(idToken) {
         ? payload["cognito:groups"][0]
         : null;
 
+      localStorage.setItem('userEmail', email);
       updateAuthUI(username, userGroup);
 
       // ✅ Call sync function

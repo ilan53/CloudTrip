@@ -1,0 +1,75 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "PutUsersLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "putUsers",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email, flightId, flightClass, passengers, price } = body;",
+                "",
+                "    if (!email || !flightId || !flightClass || !passengers || !price) {",
+                "      return { statusCode: 400, body: JSON.stringify({ error: 'Missing fields' }) };",
+                "    }",
+                "",
+                "    const newBooking = `${flightId} (${passengers}Adults-${flightClass}-${Number(price).toFixed(2)})`;",
+                "",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET bookedFlights = list_append(if_not_exists(bookedFlights, :empty), :new)',",
+                "      ExpressionAttributeValues: {",
+                "        ':new': [newBooking],",
+                "        ':empty': []",
+                "      }",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },",
+                "      body: JSON.stringify({ message: 'User updated successfully', newBooking })",
+                "    };",
+                "",
+                "  } catch (err) {",
+                "    console.error('❌ Error updating user:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaFunctionName": {
+      "Description": "Lambda Function Name",
+      "Value": { "Ref": "PutUsersLambda" }
+    },
+    "LambdaFunctionArn": {
+      "Description": "Lambda ARN",
+      "Value": { "Fn::GetAtt": [ "PutUsersLambda", "Arn" ] }
+    }
+  }
+}

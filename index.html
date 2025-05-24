@@ -42,20 +42,22 @@
                         <select id="from">
                             <option value="">Select city</option>
                         </select>
+                        <p id="loading-cities" style="color: rgb(196, 12, 156);">Loading cities...</p>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="to-group" style="display: none;">
                         <label for="to">To:</label>
                         <select id="to">
                             <option value="">Select city</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="departure-date">Departure:</label>
-                        <input type="date" id="departure-date" />
-                    </div>
+                    <div class="form-group" id="class-group" style="display:none;">
+                        <label for="flight-class">Class:</label>
+                        <select id="flight-class">
+                            <option value="">Select class</option>
+                        </select>
+                        </div>
                 </div>
 
                 <div class="form-row">
@@ -68,16 +70,24 @@
                             <option value="4">4 Adults</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="flight-class">Class</label>
-                        <select id="flight-class">
-                            <option value="Economy">Economy</option>
-                            <option value="Premium Economy">Premium Economy</option>
-                            <option value="Business">Business</option>
-                            <option value="First Class">First Class</option>
+                    <div class="form-group" id="departure-group" style="display: none;">
+                        <label for="departure-date">Departure:</label>
+                        <select id="departure-date">
+                            <option value="">Select a date</option>
                         </select>
                     </div>
                 </div>
+                <div class="form-row" id="flight-info-row" style="display: none;">
+                    <div class="form-group">
+                        <label>Flight ID:</label>
+                        <p id="flight-id" class="highlight-box"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Price:</label>
+                        <p id="flight-price" class="highlight-box"></p>
+                    </div>
+                </div>
+
 
                 <button type="submit" class="order-button">Order Ticket</button>
             </form>
@@ -148,7 +158,8 @@
         <p>&copy; 2025 CloudTrip. All rights reserved.</p>
     </footer>
 
+    <script src="js/sharedApi.js"></script>
     <script src="js/index.js"></script>
-    <script src="../js/auth.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
