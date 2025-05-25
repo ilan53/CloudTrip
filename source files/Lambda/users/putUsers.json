@@ -22,7 +22,7 @@
                 "exports.handler = async (event) => {",
                 "  try {",
                 "    const body = JSON.parse(event.body);",
-                "    const { email, flightId, flightClass, passengers, price } = body;",
+                "    const { email, flightId, class: flightClass, passengers, price } = body;",
                 "",
                 "    if (!email || !flightId || !flightClass || !passengers || !price) {",
                 "      return { statusCode: 400, body: JSON.stringify({ error: 'Missing fields' }) };",

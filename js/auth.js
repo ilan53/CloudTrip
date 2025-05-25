@@ -86,31 +86,35 @@ async function exchangeCodeForTokens(code) {
 
 function displayUserInfo(idToken) {
   try {
-      const payload = JSON.parse(atob(idToken.split('.')[1]));
-      console.log('User Info:', payload);
+    const payload = JSON.parse(atob(idToken.split('.')[1]));
+    console.log('User Info:', payload);
 
-      const username = payload['cognito:username'] || 'User';
-      const fullName = `${payload.name || ''} ${payload.family_name || ''}`.trim();
-      const email = payload.email;
-      const userGroup = payload["cognito:groups"]
-        ? payload["cognito:groups"][0]
-        : null;
+    // בנה שם מלא מהשדות name ו־family_name
+    const fullName = `${payload.name || ''} ${payload.family_name || ''}`.trim();
+    const email = payload.email;
+    const userGroup = payload["cognito:groups"]
+      ? payload["cognito:groups"][0]
+      : null;
 
-      localStorage.setItem('userEmail', email);
-      updateAuthUI(username, userGroup);
+    // שמור את המייל בלוקאל סטורג'
+    localStorage.setItem('userEmail', email);
 
-      // ✅ Call sync function
-      syncUserToDynamo(fullName, email);
+    // עדכן את ה־UI עם שם מלא
+    updateAuthUI(fullName, userGroup);
+
+    // סנכרן את המשתמש לדיינמונדבי
+    syncUserToDynamo(fullName, email);
 
   } catch (error) {
-      console.error('Error displaying user info:', error);
-      Swal.fire({
-        title: "Error!",
-        text: "Error displaying user information",
-        icon: "error"
-      });
+    console.error('Error displaying user info:', error);
+    Swal.fire({
+      title: "Error!",
+      text: "Error displaying user information",
+      icon: "error"
+    });
   }
 }
+
 
 
 async function syncUserToDynamo(fullName, email) {
@@ -136,7 +140,9 @@ function updateAuthUI(username, userGroup) {
   const authButton = document.getElementById('authButton');
   const adminPage = document.getElementById('adminCheck');
   const authContainer = document.getElementById('authContainer');
-  if (!userGreeting || !authButton || !adminPage || !authContainer) {
+  const signUpButton = document.querySelector('.btn-signup');
+
+  if (!userGreeting || !authButton || !adminPage || !authContainer || !signUpButton) {
     console.log("⏸️ UI update skipped — elements not found in DOM");
     return;
   }
@@ -144,19 +150,25 @@ function updateAuthUI(username, userGroup) {
   if (username) {
     userGreeting.textContent = `Hello, ${username}`;
     userGreeting.classList.remove('d-none');
+
     authButton.textContent = 'Sign Out';
     authButton.onclick = signOut;
     authButton.classList.remove('btn-login');
     authButton.classList.add('btn-danger');
 
+    signUpButton.style.display = 'none'; // Hide sign-up
+
     adminPage.classList.toggle('d-none', userGroup !== 'Admin');
   } else {
     userGreeting.textContent = '';
     userGreeting.classList.add('d-none');
+
     authButton.textContent = 'Login';
     authButton.onclick = signIn;
     authButton.classList.remove('btn-danger');
     authButton.classList.add('btn-login');
+
+    signUpButton.style.display = 'inline-block'; // Show sign-up
 
     adminPage.classList.add('d-none');
   }
