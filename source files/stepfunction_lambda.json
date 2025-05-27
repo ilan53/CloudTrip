@@ -1,0 +1,73 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "ExistingLambdaRoleArn": {
+      "Type": "String",
+      "Description": "Existing IAM Role ARN for Lambda"
+    },
+    "ExistingStepFunctionRoleArn": {
+      "Type": "String",
+      "Description": "Existing IAM Role ARN for Step Function"
+    }
+  },
+  "Resources": {
+    "CreateSNSTopicPython": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "CreateSNSTopicPython",
+        "Handler": "index.lambda_handler",
+        "Runtime": "python3.12",
+        "Role": { "Ref": "ExistingLambdaRoleArn" },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "import boto3",
+                "import os",
+                "",
+                "sns = boto3.client('sns')",
+                "",
+                "def lambda_handler(event, context):",
+                "    topic_name = event.get('topic_name', 'MyDefaultTopic')",
+                "    email = event.get('email')",
+                "    if not email:",
+                "        return { 'statusCode': 400, 'body': 'Missing email in input' }",
+                "",
+                "    topic = sns.create_topic(Name=topic_name)",
+                "    topic_arn = topic['TopicArn']",
+                "",
+                "    sns.subscribe(",
+                "        TopicArn=topic_arn,",
+                "        Protocol='email',",
+                "        Endpoint=email",
+                "    )",
+                "",
+                "    return {",
+                "        'statusCode': 200,",
+                "        'body': f'Successfully created topic and subscribed {email} to {topic_arn}'",
+                "    }"
+              ]
+            ]
+          }
+        }
+      }
+    },
+
+    "CreateAndSubscribeUserToSnsTopic": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "StateMachineName": "CreateAndSubscribeUserToSnsTopic",
+        "RoleArn": { "Ref": "ExistingStepFunctionRoleArn" },
+        "DefinitionString": {
+          "Fn::Sub": [
+            "{\n  \"Comment\": \"Invoke Lambda to create and subscribe SNS\",\n  \"StartAt\": \"InvokeLambda\",\n  \"States\": {\n    \"InvokeLambda\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${LambdaArn}\",\n      \"End\": true\n    }\n  }\n}",
+            {
+              "LambdaArn": { "Fn::GetAtt": [ "CreateSNSTopicPython", "Arn" ] }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

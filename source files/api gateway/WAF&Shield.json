@@ -1,0 +1,84 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Create WAF WebACL for FlightApi with AWS managed rules",
+  "Parameters": {
+    "FlightApiRestApiId": {
+      "Type": "String",
+      "Description": "The ID of the FlightApi REST API (e.g., a1b2c3d4e5)"
+    }
+  },
+  "Resources": {
+    "PLOCAPIWebACL": {
+      "Type": "AWS::WAFv2::WebACL",
+      "Properties": {
+        "Name": "PLOCAPIWebACL",
+        "Scope": "REGIONAL",
+        "DefaultAction": {
+          "Allow": {}
+        },
+        "VisibilityConfig": {
+          "SampledRequestsEnabled": true,
+          "CloudWatchMetricsEnabled": true,
+          "MetricName": "PLOCAPIWebACL"
+        },
+        "Rules": [
+          {
+            "Name": "AWS-AWSManagedRulesCommonRuleSet",
+            "Priority": 1,
+            "OverrideAction": {
+              "None": {}
+            },
+            "Statement": {
+              "ManagedRuleGroupStatement": {
+                "VendorName": "AWS",
+                "Name": "AWSManagedRulesCommonRuleSet"
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": "CommonRuleSet"
+            }
+          },
+          {
+            "Name": "AWS-AWSManagedRulesSQLiRuleSet",
+            "Priority": 2,
+            "OverrideAction": {
+              "None": {}
+            },
+            "Statement": {
+              "ManagedRuleGroupStatement": {
+                "VendorName": "AWS",
+                "Name": "AWSManagedRulesSQLiRuleSet"
+              }
+            },
+            "VisibilityConfig": {
+              "SampledRequestsEnabled": true,
+              "CloudWatchMetricsEnabled": true,
+              "MetricName": "SQLiRuleSet"
+            }
+          }
+        ]
+      }
+    },
+    "WebACLAssociation": {
+      "Type": "AWS::WAFv2::WebACLAssociation",
+      "Properties": {
+        "ResourceArn": {
+          "Fn::Sub": "arn:aws:apigateway:${AWS::Region}::/restapis/7ymgqht45l/stages/prod"
+        },
+        "WebACLArn": {
+          "Fn::GetAtt": [ "PLOCAPIWebACL", "Arn" ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "WebACLArn": {
+      "Description": "ARN of the created WebACL",
+      "Value": {
+        "Fn::GetAtt": [ "PLOCAPIWebACL", "Arn" ]
+      }
+    }
+  }
+}
