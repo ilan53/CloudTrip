@@ -815,8 +815,9 @@
     },
     "LambdaInvokePermissionGet": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "GetFlightsLambda",
       "Properties": {
-        "FunctionName": "getFlights",
+        "FunctionName": { "Ref": "GetFlightsLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -826,8 +827,9 @@
     },
     "LambdaInvokePermissionPost": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "PostFlightsLambda",
       "Properties": {
-        "FunctionName": "postFlights",
+        "FunctionName": { "Ref": "PostFlightsLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -837,8 +839,9 @@
     },
     "LambdaInvokePermissionPut": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "PutFlightsLambda",
       "Properties": {
-        "FunctionName": "putFlights",
+        "FunctionName": { "Ref": "PutFlightsLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -848,8 +851,9 @@
     },
     "LambdaInvokePermissionDelete": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "DeleteFlightsLambda",
       "Properties": {
-        "FunctionName": "deleteFlights",
+        "FunctionName": { "Ref": "DeleteFlightsLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -980,8 +984,9 @@
     },
     "LambdaInvokePermissionGetUsers": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "GetUsersLambda",
       "Properties": {
-        "FunctionName": "getUsers",
+        "FunctionName": { "Ref": "GetUsersLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -991,8 +996,9 @@
     },
     "LambdaInvokePermissionPutUsers": {
       "Type": "AWS::Lambda::Permission",
+      "DependsOn": "PutUsersLambda",
       "Properties": {
-        "FunctionName": "putUsers",
+        "FunctionName": { "Ref": "PutUsersLambda" },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
