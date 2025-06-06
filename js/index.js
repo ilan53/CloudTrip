@@ -172,55 +172,54 @@ function hideGroup(id) {
 }
 
 function setupOrderButton() {
-    const form = document.getElementById("flight-search-form");
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  const form = document.getElementById("flight-search-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const from = document.getElementById("from").value;
-        const to = document.getElementById("to").value;
-        const selectedClass = document.getElementById("flight-class").value;
-        const passengers = parseInt(document.getElementById("passengers").value);
-        const date = document.getElementById("departure-date").value;
-        const flightId = `${document.getElementById("flight-id").textContent}`;
-        const priceText = document.getElementById("flight-price").textContent.replace("$", "");
-        const price = parseFloat(priceText);
-        const userEmail = localStorage.getItem("userEmail");
-console.log({
-  userEmail: localStorage.getItem("userEmail"),
-  flightId: document.getElementById("flight-id").textContent,
-  passengers: document.getElementById("passengers").value,
-  price: document.getElementById("flight-price").textContent,
-  selectedClass: document.getElementById("flight-class").value
-});
+    const userEmail = localStorage.getItem("userEmail");
+    if (!userEmail) {
+      alert("👋 Please sign in before booking a flight.");
+      window.location.href = "https://cloudtripuserpool.auth.us-east-1.amazoncognito.com/login?client_id=6pk04s75djbfe9ajrboae9o5jq&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html";
+      return;
+    }
 
-        if (!userEmail || !flightId || !passengers || !price || !selectedClass) {
-            alert("Missing booking information. Make sure you're logged in and all fields are selected.");
-            return;
-        }
+    const from = document.getElementById("from").value;
+    const to = document.getElementById("to").value;
+    const selectedClass = document.getElementById("flight-class").value;
+    const passengers = parseInt(document.getElementById("passengers").value);
+    const date = document.getElementById("departure-date").value;
+    const flightId = `${document.getElementById("flight-id").textContent}`;
+    const priceText = document.getElementById("flight-price").textContent.replace("$", "");
+    const price = parseFloat(priceText);
 
-        try {
-            const res = await fetch(USERS_API, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: userEmail,
-                    flightId,
-                    class: selectedClass,
-                    passengers,
-                    price
-                })
-            });
+    if (!flightId || !passengers || !price || !selectedClass) {
+      alert("Missing booking information. Please complete all fields.");
+      return;
+    }
 
-            const data = await res.json();
-            if (res.ok) {
-                alert(`🎫 Ticket booked successfully!\n\n✈️ Flight ID: ${flightId}\n👤 Passengers: ${passengers}\n💺 Class: ${selectedClass}\n💰 Price: $${price.toFixed(2)}`);
-            } else {
-                console.error("Error booking flight:", data);
-                alert("❌ Failed to book flight.");
-            }
-        } catch (err) {
-            console.error("❌ Network or server error:", err);
-            alert("❌ Network error occurred while booking.");
-        }
-    });
+    try {
+      const res = await fetch(USERS_API, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          flightId,
+          class: selectedClass,
+          passengers,
+          price
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`🎫 Ticket booked successfully!\n\n✈️ Flight ID: ${flightId}\n👤 Passengers: ${passengers}\n💺 Class: ${selectedClass}\n💰 Price: $${price.toFixed(2)}`);
+      } else {
+        console.error("Error booking flight:", data);
+        alert("❌ Failed to book flight.");
+      }
+    } catch (err) {
+      console.error("❌ Network or server error:", err);
+      alert("❌ Network error occurred while booking.");
+    }
+  });
 }

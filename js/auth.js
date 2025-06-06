@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
       window.history.replaceState({}, document.title, currentUrl);
     } else {
       updateAuthUI(null);
+      createNavbar();
     }
   }
 });
@@ -40,8 +41,10 @@ function signIn() {
 function signOut() {
   const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/logout?client_id=${cognitoConfig.ClientId}&logout_uri=${encodeURIComponent(cognitoConfig.redirectUri)}`;
   localStorage.removeItem('id_token');
+  localStorage.removeItem('userEmail'); // הוספה חשובה
   window.location.href = url;
 }
+
 
 async function exchangeCodeForTokens(code) {
   const tokenEndpoint = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/oauth2/token`;
@@ -104,6 +107,9 @@ function displayUserInfo(idToken) {
 
     // סנכרן את המשתמש לדיינמונדבי
     syncUserToDynamo(fullName, email);
+
+    createNavbar();
+
 
   } catch (error) {
     console.error('Error displaying user info:', error);

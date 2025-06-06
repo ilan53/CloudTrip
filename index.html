@@ -9,24 +9,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-    <header>
+<header>
+  <div class="navbar-container">
     <div class="logo">
       <img src="img/logo.png" alt="CloudTrip Logo">
     </div>
     <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="pages/mostVisited.html">Most Visited</a></li>
-        <li><a href="pages/contact.html">Contact</a></li>
-        <li id="adminCheck" class="d-none"><a href="pages/admin.html">Admin Panel</a></li>
-        <li id="authContainer">
-          <span id="userGreeting" class="d-none me-2"></span>
-          <a href="#" id="authButton" class="btn-login">Login</a>
-        </li>
-        <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
-      </ul>
+      <div class="nav-left">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pages/mostVisited.html">Most Visited</a></li>
+          <li><a href="pages/contact.html">Contact</a></li>
+          <li id="adminCheck" class="d-none"><a href="pages/admin.html">Admin Panel</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <ul id="authContainer">
+          <li><span id="userGreeting" class="d-none me-2"></span></li>
+          <li><a href="#" id="authButton" class="btn-login">Login</a></li>
+          <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+        </ul>
+      </div>
     </nav>
-    </header>
+  </div>
+</header>
+
 
     <!-- Section 1: booking-container -->
     <main class="booking-container">
@@ -121,32 +128,35 @@
     </section>
 
     <!-- Section 3: Popular Destinations -->
-    <section class="popular-destinations">
-        <h2>Popular Destinations</h2>
-        <div class="destinations-grid">
-            <div class="destination-card">
-                <img src="img/paris.jpg" alt="Paris" />
-                <div class="destination-info">
-                    <h3>Paris</h3>
-                    <p>From $299</p>
-                </div>
-            </div>
-            <div class="destination-card">
-                <img src="img/rome.jpg" alt="Tokyo" />
-                <div class="destination-info">
-                    <h3>Tokyo</h3>
-                    <p>From $599</p>
-                </div>
-            </div>
-            <div class="destination-card">
-                <img src="img/new-york.jpg" alt="New York" />
-                <div class="destination-info">
-                    <h3>New York</h3>
-                    <p>From $399</p>
-                </div>
+   <!--
+<section class="popular-destinations">
+    <h2>Popular Destinations</h2>
+    <div class="destinations-grid">
+        <div class="destination-card">
+            <img src="img/paris.jpg" alt="Paris" />
+            <div class="destination-info">
+                <h3>Paris</h3>
+                <p>From $299</p>
             </div>
         </div>
-    </section>
+        <div class="destination-card">
+            <img src="img/rome.jpg" alt="Tokyo" />
+            <div class="destination-info">
+                <h3>Tokyo</h3>
+                <p>From $599</p>
+            </div>
+        </div>
+        <div class="destination-card">
+            <img src="img/new-york.jpg" alt="New York" />
+            <div class="destination-info">
+                <h3>New York</h3>
+                <p>From $399</p>
+            </div>
+        </div>
+    </div>
+</section>
+-->
+
 
     <!-- Section 4: Flight results -->
     <section>

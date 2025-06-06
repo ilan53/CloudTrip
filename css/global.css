@@ -1,85 +1,91 @@
 *{
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background-color: #e0f2f7; /* Light blue background */
-direction: ltr;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e0f2f7; /* Light blue background */
+  direction: ltr;
 }
 
 header {
-background-color: rgba(124, 136, 178, 0.29); /* semi-transparent */
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 10px 30px;
-border-bottom: 2px solid #ccc;
-position: sticky;
-top: 0;
-z-index: 1000;
+  background-color: rgba(124, 136, 178, 0.29); /* semi-transparent */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  border-bottom: 2px solid #ccc;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo img {
-height: 100px;
+  height: 100px;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 nav ul {
-list-style: none;
-display: flex;
-gap: 20px;
-align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 nav ul li a {
-text-decoration: none;
-color: #333;
-font-weight: 500;
-padding: 5px 10px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 5px 10px;
 }
 
 nav ul li a:hover {
-    color: #3498db;
+  color: #3498db;
 }
 
 .btn-login,
 .btn-signup {
-    padding: 0.5rem 1.5rem;
-    border: 1px;
-    border-radius: 10px;
-    font-weight: 500;
-    transition: all 0.3s;
+  padding: 0.5rem 1.5rem;
+  border: 1px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
 .btn-login,
 .btn-signup {
-    background-color: rgba(255, 255, 255, 0.7);
-    border: 2px solid #3498db;
-    color: #3498db;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 2px solid #3498db;
+  color: #3498db;
 }
 
 .btn-login:hover,
 .btn-signup:hover {
-    background-color: #3498db;
-    color: white;
+  background-color: #3498db;
+  color: white;
 }
 
 .btn-login.active,
 .btn-signup.active {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
 }
 
 footer {
-background-color: #ffffff;
-text-align: center;
-padding: 15px;
-border-top: 1px solid #ccc;
-font-size: 14px;
-color: #666;
+  background-color: #ffffff;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ccc;
+  font-size: 14px;
+  color: #666;
 }
 
 .btn-danger {
@@ -95,4 +101,35 @@ color: #666;
 
 .btn-danger:hover {
   background-color: #bd2130;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-left ul,
+.nav-right ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-left ul {
+  justify-content: flex-start;
+}
+
+.nav-right ul {
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* ✅ הדגש קישור פעיל בתפריט */
+.nav-left a.active {
+  border-bottom: 2px solid #e91e63;
+  padding-bottom: 3px;
 }
