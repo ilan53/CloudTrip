@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   populateFromSelect();
   setupOrderButton();
+  const userEmail = localStorage.getItem("userEmail");
+  const myBookingsLink = document.getElementById("myBookingsLink");
+  if (userEmail && myBookingsLink) {
+    myBookingsLink.classList.remove("d-none");
+  }
 });
 
 async function populateFromSelect() {
