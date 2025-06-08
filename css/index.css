@@ -168,3 +168,8 @@ form {
   display: none !important;
 }
 
+.nav-left a.active {
+  border-bottom: 2px solid #0b2ede;
+  padding-bottom: 3px;
+}
+

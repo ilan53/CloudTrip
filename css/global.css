@@ -130,6 +130,6 @@ nav {
 
 /* ✅ הדגש קישור פעיל בתפריט */
 .nav-left a.active {
-  border-bottom: 2px solid #e91e63;
+  border-bottom: 2px solid #0b2ede;
   padding-bottom: 3px;
 }
