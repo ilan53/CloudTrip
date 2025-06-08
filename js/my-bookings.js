@@ -21,13 +21,12 @@ async function loadBookings() {
       return;
     }
 
-    container.innerHTML = ""; // ניקוי
+    container.innerHTML = "";
 
     user.bookedFlights.forEach((booking, index) => {
       const item = document.createElement("div");
       item.classList.add("booking-card");
 
-      // פענוח פרטי ההזמנה מתוך המחרוזת
       const flightIdMatch = booking.match(/^([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
       const extrasMatch = booking.match(/\((.*?)\)/);
 
@@ -46,15 +45,11 @@ async function loadBookings() {
           <p><strong>👤 Passengers:</strong> ${passengers}</p>
           <p><strong>💺 Class:</strong> ${flightClass}</p>
           <p><strong>💰 Price:</strong> $${price}</p>
-          </div>
-            <div class="actions">
-                <button onclick="editBooking(${index})" title="Edit" class="icon-btn">
-                ✏️
-                </button>
-                <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">
-                🗑️
-                </button>
-            </div>
+        </div>
+        <div class="actions">
+          <button onclick="editBooking(${index})" title="Edit" class="icon-btn">✏️</button>
+          <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
+        </div>
       `;
       container.appendChild(item);
     });
@@ -66,35 +61,39 @@ async function loadBookings() {
 }
 
 async function deleteBooking(index) {
+  console.log("Deleting booking at index:", index);
   const userEmail = localStorage.getItem("userEmail");
-  const res = await fetch(`${USERS_API}?email=${encodeURIComponent(userEmail)}`);
-  const users = await res.json();
-  const user = Array.isArray(users) ? users.find(u => u.email === userEmail) : null;
 
-  if (!user || !user.bookedFlights) {
-    alert("No bookings to delete.");
+  if (!userEmail) {
+    alert("User not logged in.");
     return;
   }
 
-  const bookings = [...user.bookedFlights];
-  bookings.splice(index, 1);
+  try {
+    const res = await fetch(USERS_API, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: userEmail, index })
+    });
 
-  await fetch(USERS_API, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: userEmail,
-      flightId: "dummy",
-      class: "dummy",
-      passengers: 1,
-      price: 1,
-      bookedFlights: bookings
-    })
-  });
+    const result = await res.json();
 
-  loadBookings();
+    if (res.ok) {
+      alert("Booking deleted successfully.");
+      loadBookings();
+    } else {
+      alert(`Failed to delete booking: ${result.error}`);
+    }
+  } catch (err) {
+    console.error("Delete request failed:", err);
+    alert("An error occurred while deleting the booking.");
+  }
 }
 
 function editBooking(index) {
   alert("Edit feature is not implemented yet.");
 }
+
+
+window.deleteBooking = deleteBooking;
+window.editBooking = editBooking;
