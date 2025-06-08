@@ -361,7 +361,9 @@
               [
                 "const AWS = require('aws-sdk');",
                 "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const sns = new AWS.SNS();",
                 "const TABLE_NAME = 'Users';",
+                "const TOPIC_ARN = 'arn:aws:sns:us-east-1:286801031611:FlightBookingTopic';",
                 "",
                 "exports.handler = async (event) => {",
                 "  try {",
@@ -384,14 +386,26 @@
                 "      }",
                 "    }).promise();",
                 "",
+                "    await sns.subscribe({",
+                "      TopicArn: TOPIC_ARN,",
+                "      Protocol: 'email',",
+                "      Endpoint: email",
+                "    }).promise();",
+                "",
+                "    await sns.publish({",
+                "      TopicArn: TOPIC_ARN,",
+                "      Message: `Hello,\\n\\nYour flight has been successfully booked!\\nFlight ID: ${flightId}`,",
+                "      Subject: 'CloudTrip \u2013 Flight Booking Confirmation'",
+                "    }).promise();",
+                "",
                 "    return {",
                 "      statusCode: 200,",
                 "      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },",
-                "      body: JSON.stringify({ message: 'User updated successfully', newBooking })",
+                "      body: JSON.stringify({ message: 'User updated and email notification sent', newBooking })",
                 "    };",
                 "",
                 "  } catch (err) {",
-                "    console.error('\u274c Error updating user:', err);",
+                "    console.error('\u274c Error updating user or sending email:', err);",
                 "    return {",
                 "      statusCode: 500,",
                 "      headers: { 'Access-Control-Allow-Origin': '*' },",
@@ -1163,6 +1177,12 @@
           "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/DELETE/users"
         }
       }
+    },
+    "FlightBookingTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": "FlightBookingTopic"
+      }
     }
   },
   "Outputs": {
@@ -1309,6 +1329,10 @@
           "Arn"
         ]
       }
+    },
+    "ManualIamRoleUpdateNote": {
+      "Description": "\u26a0\ufe0f Manual Step Required: Update IAM Role (LabRole) to allow sns:Publish to FlightBookingTopic",
+      "Value": "Go to IAM Console \u2192 Roles \u2192 LabRole \u2192 Add inline policy with sns:Publish to arn:aws:sns:us-east-1:*:FlightBookingTopic"
     }
   }
 }
