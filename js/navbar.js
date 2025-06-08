@@ -1,5 +1,8 @@
 function createNavbar() {
   const userEmail = localStorage.getItem("userEmail");
+  const userName = localStorage.getItem("userName") || userEmail?.split('@')[0] || '';
+  const currentPage = window.location.pathname.split('/').pop();
+  const isLoggedIn = !!userEmail;
 
   const navbar = `
     <div class="logo">
@@ -11,15 +14,19 @@ function createNavbar() {
           <li><a href="../index.html">Home</a></li>
           <li><a href="mostVisited.html">Most Visited</a></li>
           <li><a href="contact.html">Contact</a></li>
-          ${userEmail ? `<li><a href="my-bookings.html">My Bookings</a></li>` : ""}
+          ${isLoggedIn ? `<li><a href="my-bookings.html">My Bookings</a></li>` : ""}
           <li id="adminCheck" class="d-none"><a href="admin.html">Admin Panel</a></li>
         </ul>
       </div>
       <div class="nav-right">
         <ul id="authContainer">
-          <li><span id="userGreeting" class="d-none me-2"></span></li>
-          <li><a href="#" id="authButton" class="btn-login">Login</a></li>
-          <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+          ${isLoggedIn ? `
+            <li><span id="userGreeting">Hello, ${userName}</span></li>
+            <li><button class="btn-signout" onclick="signOut()">Sign Out</button></li>
+          ` : `
+            <li><a href="#" id="authButton" class="btn-login">Login</a></li>
+            <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+          `}
         </ul>
       </div>
     </nav>
@@ -29,8 +36,8 @@ function createNavbar() {
   if (header) {
     header.innerHTML = navbar;
 
-    // ✅ הדגש קישור פעיל בתפריט
-    const currentPage = window.location.pathname.split('/').pop(); // לדוגמה: "contact.html"
+    // הדגשת הקישור הפעיל
+    const currentPage = window.location.pathname.split('/').pop();
     document.querySelectorAll('.nav-left a').forEach(link => {
       const linkHref = link.getAttribute('href');
       if (linkHref.includes(currentPage)) {
@@ -38,4 +45,10 @@ function createNavbar() {
       }
     });
   }
+}
+
+function signOut() {
+  localStorage.removeItem("userEmail");
+  localStorage.removeItem("userName");
+  window.location.href = "../index.html";
 }

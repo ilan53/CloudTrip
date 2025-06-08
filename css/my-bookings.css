@@ -1,16 +1,25 @@
+/* עיצוב בסיס */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f0f4f8;
   margin: 0;
+  background-color: #dbe1f1; /* זהה ל-global.css */
+}
+
+/* תוכן עמוד */
+main {
   padding: 20px;
+  background-color: #f0f4f8;
 }
 
-h1 {
-  color: #333;
+/* כותרת */
+h2 {
   text-align: center;
-  margin-bottom: 30px;
+  color: #333;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
+/* מיכל ההזמנות */
 #bookings-container {
   max-width: 700px;
   margin: 0 auto;
@@ -20,48 +29,7 @@ h1 {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-}
-
-.booking-info {
-  flex: 1;
-}
-
-.actions button {
-  margin-left: 8px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  background-color: #1976d2;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.actions button:hover {
-  background-color: #1565c0;
-}
-
-.actions button.delete {
-  background-color: #e53935;
-}
-
-.actions button.delete:hover {
-  background-color: #c62828;
-}
+/* כרטיס הזמנה */
 .booking-card {
   display: flex;
   justify-content: space-between;
@@ -85,6 +53,7 @@ li {
   color: #333;
 }
 
+/* אזור כפתורים */
 .actions {
   display: flex;
   flex-direction: column;
@@ -121,4 +90,12 @@ li {
 
 .icon-btn.delete {
   color: #e74c3c;
+}
+
+/* פוטר */
+footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 14px;
+  color: #555;
 }

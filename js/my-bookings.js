@@ -47,7 +47,6 @@ async function loadBookings() {
           <p><strong>💰 Price:</strong> $${price}</p>
         </div>
         <div class="actions">
-          <button onclick="editBooking(${index})" title="Edit" class="icon-btn">✏️</button>
           <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
         </div>
       `;
@@ -88,10 +87,6 @@ async function deleteBooking(index) {
     console.error("Delete request failed:", err);
     alert("An error occurred while deleting the booking.");
   }
-}
-
-function editBooking(index) {
-  alert("Edit feature is not implemented yet.");
 }
 
 
