@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_ShVX2senh',
-  ClientId: '2he71d8v8fodr3q2ek87kuheub',
+  UserPoolId: 'us-east-1_sXhtYmLxG',
+  ClientId: '580rio24tbpquqsbk6htuduuof',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -103,7 +103,7 @@ function displayUserInfo(idToken) {
     updateAuthUI(fullName, userGroup);
 
     // סנכרן את המשתמש לדיינמונדבי
-    syncUserToDynamo(fullName, email);
+   // syncUserToDynamo(fullName, email);
 
   } catch (error) {
     console.error('Error displaying user info:', error);
@@ -117,22 +117,22 @@ function displayUserInfo(idToken) {
 
 
 
-async function syncUserToDynamo(fullName, email) {
-  try {
-    const response = await fetch('https://8r8jt6jpy9.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fullName, email })
-    });
+//async function syncUserToDynamo(fullName, email) {
+ // try {
+ //   const response = await fetch('https://8r8jt6jpy9.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
+ //     method: 'POST',
+ //     headers: {
+ //       'Content-Type': 'application/json'
+ //     },
+ //     body: JSON.stringify({ fullName, email })
+ //   });
 
-    if (!response.ok) throw new Error('Sync failed');
-    console.log('User synced to DynamoDB');
-  } catch (err) {
-    console.error('Error syncing user:', err);
-  }
-}
+ //   if (!response.ok) throw new Error('Sync failed');
+ //   console.log('User synced to DynamoDB');
+ // } catch (err) {
+ //   console.error('Error syncing user:', err);
+ // }
+//}
 
 
 function updateAuthUI(username, userGroup) {

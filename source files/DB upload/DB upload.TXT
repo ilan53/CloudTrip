@@ -1,4 +1,4 @@
 CloudShell -> upload : uploadFlightsToDynamo.js, flights_data.json
 npm init -y
-npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodbnode 
+npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
 node uploadFlightsToDynamo.js 
