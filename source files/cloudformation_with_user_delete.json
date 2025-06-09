@@ -642,7 +642,18 @@
         "UserPoolId": {
           "Ref": "UserPool"
         },
-        "Description": "Admin group for CloudTrip",
+        "RoleArn": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        }
+      }
+    },
+    "UserGroupUsers": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "Users",
+        "UserPoolId": {
+          "Ref": "UserPool"
+        },
         "RoleArn": {
           "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
         }
