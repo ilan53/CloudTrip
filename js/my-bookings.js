@@ -1,4 +1,4 @@
-const USERS_API = "https://ebadnoasn0.execute-api.us-east-1.amazonaws.com/prod/users";
+const USERS_API = "https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/users";
 
 document.addEventListener("DOMContentLoaded", loadBookings);
 

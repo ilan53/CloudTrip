@@ -1,4 +1,4 @@
-const API = "https://ebadnoasn0.execute-api.us-east-1.amazonaws.com/prod/";
+const API = "https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/";
 const FLIGHTS_API = API + "flights"; 
 const USERS_API = API + "users";
 

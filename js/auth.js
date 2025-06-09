@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_JRC490st7'	,
-  ClientId: '6pk04s75djbfe9ajrboae9o5jq',
+  UserPoolId: 'us-east-1_XQRwAw4VS'	,
+  ClientId: '5foi8ji8i5dlg7f6m04altov4q',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -125,7 +125,7 @@ function displayUserInfo(idToken) {
 
 async function syncUserToDynamo(fullName, email) {
   try {
-    const response = await fetch('https://ebadnoasn0.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
+    const response = await fetch('https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
