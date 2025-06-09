@@ -1,0 +1,68 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "DeleteUserBookingLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "deleteUserBooking",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email, index } = body;",
+                "",
+                "    if (!email || index === undefined) {",
+                "      return { statusCode: 400, body: JSON.stringify({ error: 'Missing email or index' }) };",
+                "    }",
+                "",
+                "    const user = await docClient.get({ TableName: TABLE_NAME, Key: { email } }).promise();",
+                "    const bookings = user.Item?.bookedFlights || [];",
+                "",
+                "    if (index < 0 || index >= bookings.length) {",
+                "      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid index' }) };",
+                "    }",
+                "",
+                "    bookings.splice(index, 1);",
+                "",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET bookedFlights = :updated',",
+                "      ExpressionAttributeValues: { ':updated': bookings }",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },",
+                "      body: JSON.stringify({ message: 'Booking deleted successfully' })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error('\u274c Error deleting booking:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  }
+}

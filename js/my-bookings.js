@@ -89,4 +89,3 @@ async function deleteBooking(index) {
 
 
 window.deleteBooking = deleteBooking;
-window.editBooking = editBooking;

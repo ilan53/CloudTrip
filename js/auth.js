@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_sXhtYmLxG',
-  ClientId: '580rio24tbpquqsbk6htuduuof',
+  UserPoolId: 'us-east-1_E82Nu8W6A',
+  ClientId: '5o1m0c6ii2v8g9887413lit20i',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -139,10 +139,11 @@ function updateAuthUI(username, userGroup) {
   const userGreeting = document.getElementById('userGreeting');
   const authButton = document.getElementById('authButton');
   const adminPage = document.getElementById('adminCheck');
+  const bookingsLink = document.getElementById('myBookingsLink');
   const authContainer = document.getElementById('authContainer');
   const signUpButton = document.querySelector('.btn-signup');
 
-  if (!userGreeting || !authButton || !adminPage || !authContainer || !signUpButton) {
+  if (!userGreeting || !authButton || !adminPage || !authContainer || !signUpButton || !bookingsLink) {
     console.log("⏸️ UI update skipped — elements not found in DOM");
     return;
   }
@@ -156,9 +157,9 @@ function updateAuthUI(username, userGroup) {
     authButton.classList.remove('btn-login');
     authButton.classList.add('btn-danger');
 
-    signUpButton.style.display = 'none'; // Hide sign-up
-
+    signUpButton.style.display = 'none';
     adminPage.classList.toggle('d-none', userGroup !== 'Admin');
+    bookingsLink.classList.remove('d-none'); 
   } else {
     userGreeting.textContent = '';
     userGreeting.classList.add('d-none');
@@ -168,12 +169,13 @@ function updateAuthUI(username, userGroup) {
     authButton.classList.remove('btn-danger');
     authButton.classList.add('btn-login');
 
-    signUpButton.style.display = 'inline-block'; // Show sign-up
-
+    signUpButton.style.display = 'inline-block';
     adminPage.classList.add('d-none');
+    bookingsLink.classList.add('d-none'); 
   }
 
   authContainer.classList.remove('d-none');
 }
+
 
 

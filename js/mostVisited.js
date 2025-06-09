@@ -1,4 +1,4 @@
-const USERS_API = "https://3h6h3mwmd2.execute-api.us-east-1.amazonaws.com/prod/users";
+const USERS_API = "https://k85r7we6eg.execute-api.us-east-1.amazonaws.com/prod/users";
 
 const airlineToCountry = {
   "LY": "Israel",
