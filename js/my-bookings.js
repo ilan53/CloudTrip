@@ -25,7 +25,9 @@ async function loadBookings() {
       const item = document.createElement("div");
       item.classList.add("booking-card");
 
-      const flightIdMatch = booking.match(/^([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
+      const flightIdMatch = booking.match(/([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
+
+
       const extrasMatch = booking.match(/\((.*?)\)/);
 
       const flightId = flightIdMatch ? flightIdMatch[1] : "N/A";

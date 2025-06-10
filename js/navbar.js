@@ -13,7 +13,6 @@ function createNavbar() {
         <ul>
           <li><a href="../index.html">Home</a></li>
           <li><a href="mostVisited.html">Most Visited</a></li>
-          <li><a href="contact.html">Contact</a></li>
           ${isLoggedIn ? `<li><a href="my-bookings.html">My Bookings</a></li>` : ""}
           <li id="adminCheck" class="d-none"><a href="admin.html">Admin Panel</a></li>
         </ul>

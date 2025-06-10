@@ -189,7 +189,8 @@ function setupOrderButton() {
     const passengers = parseInt(document.getElementById("passengers").value);
     const date = document.getElementById("departure-date").value;
     const currentFlight = filteredFlights.find(f => f.date === date);
-    const flightId = `${currentFlight.operator} ${currentFlight.flightNumber}-${currentFlight.date}-${currentFlight.time} (${passengers}Adults-${selectedClass}-${currentFlight.price}) from ${currentFlight.from} to ${currentFlight.to} (${currentFlight.countryTo})`;
+    const flightId = `${currentFlight.flightNumber}-${currentFlight.date}-${currentFlight.time} (${passengers}Adults-${selectedClass}-${currentFlight.price}) from ${currentFlight.from} to ${currentFlight.to} (${currentFlight.countryTo})`;
+
 
     const priceText = document.getElementById("flight-price").textContent.replace("$", "");
     const price = parseFloat(priceText);

@@ -1,4 +1,3 @@
-const USERS_API = "https://k85r7we6eg.execute-api.us-east-1.amazonaws.com/prod/users";
 
 const airlineToCountry = {
   "LY": "Israel",
@@ -6,8 +5,12 @@ const airlineToCountry = {
   "LH": "Germany",
   "A3": "Greece",
   "W6": "Hungary",
-  "FR": "Ireland"
+  "FR": "Ireland",
+  "SN": "Belgium",   
+  "AF": "France"      
 };
+
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("top-destinations");
@@ -20,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     users.forEach(user => {
       (user.bookedFlights || []).forEach(flight => {
-        const airlineCode = flight.split(" ")[0]; // שולף LY, LH וכו'
+        const airlineCode = flight.match(/\b[A-Z0-9]{2}\b/)?.[0];
         const country = airlineToCountry[airlineCode] || "Unknown";
         counts[country] = (counts[country] || 0) + 1;
       });
