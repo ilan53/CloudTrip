@@ -14,6 +14,7 @@ function createNavbar() {
           <li><a href="../index.html">Home</a></li>
           <li><a href="mostVisited.html">Most Visited</a></li>
           ${isLoggedIn ? `<li><a href="my-bookings.html">My Bookings</a></li>` : ""}
+          ${isLoggedIn ? `<li><a href="my-map.html">My Trips Map</a></li>` : ""}
           <li id="adminCheck" class="d-none"><a href="admin.html">Admin Panel</a></li>
         </ul>
       </div>
@@ -24,7 +25,7 @@ function createNavbar() {
             <li><button class="btn-signout" onclick="signOut()">Sign Out</button></li>
           ` : `
             <li><a href="#" id="authButton" class="btn-login">Login</a></li>
-            <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+            <li><button class="btn-danger" onclick="signOut()">Sign Out</button></li>
           `}
         </ul>
       </div>

@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     users.forEach(user => {
       (user.bookedFlights || []).forEach(flight => {
-        // שולף את העיר שאליה טסו
         const toMatch = flight.match(/to ([A-Za-z\s]+) \(/);
         const toCity = toMatch ? toMatch[1].trim() : "Unknown";
         const country = cityToCountry[toCity] || "Unknown";
@@ -34,19 +33,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
 
+    const maxCount = Math.max(...Object.values(countryCounts));
+
     container.innerHTML = `
-  <h2>🌍 Top 10 Most Visited Countries</h2>
-  <ul class="destination-list">
-    ${sortedCountries.map(([country, count], index) => `
-      <li>
-        ${index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
-        <img src="../img/flags/${country.toLowerCase().replace(/\s/g, "-")}.png"
-             alt="${country} flag" class="flag" onerror="this.style.display='none'" />
-        ${country} – ${count} bookings
-      </li>
-    `).join("")}
-  </ul>
-`;
+      <h2>🌍 Top 10 Most Visited Countries</h2>
+      <ul class="destination-list">
+        ${sortedCountries.map(([country, count], index) => `
+          <li>
+            ${
+              maxCount > 1
+                ? index === 0
+                  ? '🏆'
+                  : index === 1
+                  ? '🥈'
+                  : index === 2
+                  ? '🥉'
+                  : ''
+                : ''
+            }
+            <img src="../img/flags/${country.toLowerCase().replace(/\s/g, "-")}.png"
+                 alt="${country} flag" class="flag" onerror="this.style.display='none'" />
+            ${country} – ${count} bookings
+          </li>
+        `).join("")}
+      </ul>
+    `;
 
   } catch (err) {
     container.textContent = "Failed to load destinations.";

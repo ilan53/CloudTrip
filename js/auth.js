@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_gcETy2O4Y',
-  ClientId: '6p8445mucohuh074iubdtfft82',
+  UserPoolId: 'us-east-1_ssHPPkj8w',
+  ClientId: '140eiu184j5e6qpjkdslaaii63',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',

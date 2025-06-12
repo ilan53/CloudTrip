@@ -22,36 +22,40 @@ async function loadBookings() {
     container.innerHTML = "";
 
     user.bookedFlights.forEach((booking, index) => {
-      const item = document.createElement("div");
-      item.classList.add("booking-card");
+  const item = document.createElement("div");
+  item.classList.add("booking-card");
 
-      const flightIdMatch = booking.match(/([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
+  const flightIdMatch = booking.match(/([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
+  const extrasMatch = booking.match(/\((.*?)\)/);
+  const routeMatch = booking.match(/from ([A-Za-z\s]+) to ([A-Za-z\s]+) \(/);
 
+  const flightId = flightIdMatch ? flightIdMatch[1] : "N/A";
+  const date = flightIdMatch ? flightIdMatch[2] : "N/A";
+  const time = flightIdMatch ? flightIdMatch[3] : "N/A";
+  const details = extrasMatch ? extrasMatch[1] : "N/A";
+  const [passengers, flightClass, price] = details.split("-");
+  const fromCity = routeMatch ? routeMatch[1].trim() : "N/A";
+  const toCity = routeMatch ? routeMatch[2].trim() : "N/A";
 
-      const extrasMatch = booking.match(/\((.*?)\)/);
+  item.innerHTML = `
+    <div class="booking-info">
+      <h3>✈️ Flight ${flightId}</h3>
+      <p><strong>📅 Date:</strong> ${date}</p>
+      <p><strong>⏰ Time:</strong> ${time}</p>
+      <p><strong>🌍 From:</strong> ${fromCity}</p>
+      <p><strong>🧭 To:</strong> ${toCity}</p>
+      <p><strong>👤 Passengers:</strong> ${passengers}</p>
+      <p><strong>💺 Class:</strong> ${flightClass}</p>
+      <p><strong>💰 Price:</strong> $${price}</p>
+    </div>
+    <div class="actions">
+      <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
+    </div>
+  `;
 
-      const flightId = flightIdMatch ? flightIdMatch[1] : "N/A";
-      const date = flightIdMatch ? flightIdMatch[2] : "N/A";
-      const time = flightIdMatch ? flightIdMatch[3] : "N/A";
-      const details = extrasMatch ? extrasMatch[1] : "N/A";
+  container.appendChild(item);
+});
 
-      const [passengers, flightClass, price] = details.split("-");
-
-      item.innerHTML = `
-        <div class="booking-info">
-          <h3>✈️ Flight ${flightId}</h3>
-          <p><strong>📅 Date:</strong> ${date}</p>
-          <p><strong>⏰ Time:</strong> ${time}</p>
-          <p><strong>👤 Passengers:</strong> ${passengers}</p>
-          <p><strong>💺 Class:</strong> ${flightClass}</p>
-          <p><strong>💰 Price:</strong> $${price}</p>
-        </div>
-        <div class="actions">
-          <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
-        </div>
-      `;
-      container.appendChild(item);
-    });
 
   } catch (err) {
     console.error("Error loading bookings:", err);

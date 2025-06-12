@@ -685,7 +685,8 @@
         "UsersGetMethod",
         "UsersPutMethod",
         "UsersOptionsMethod",
-        "UsersDeleteMethod"
+        "UsersDeleteMethod",
+        "deleteUserBooking"
       ],
       "Properties": {
         "RestApiId": {
