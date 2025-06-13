@@ -134,48 +134,58 @@ function displayUserInfo(idToken) {
  // }
 //}
 
-
 function updateAuthUI(username, userGroup) {
+  console.log("a");
   const userGreeting = document.getElementById('userGreeting');
-  const authButton = document.getElementById('authButton');
-  const adminPage = document.getElementById('adminCheck');
-  const bookingsLink = document.getElementById('myBookingsLink');
-  const authContainer = document.getElementById('authContainer');
-  const signUpButton = document.querySelector('.btn-signup');
 
-  if (!userGreeting || !authButton || !adminPage || !authContainer || !signUpButton || !bookingsLink) {
-    console.log("⏸️ UI update skipped — elements not found in DOM");
-    return;
-  }
+  const adminPage = document.querySelector('.adminCheck');
+  const bookingsLink = document.querySelector('.myBooking');
+  const tripMapLink = document.querySelector('.TripMap');
+
+  const authContainer = document.getElementById('authContainer');
+
+  const signUpButton = document.querySelector('.btn-signup');
+  const signInButton = document.querySelector('.btn-login');
+  const signOutButton = document.querySelector('.btn-signout');
+
+if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInButton || !bookingsLink || !tripMapLink) {
+  console.log("⏸️ updateAuthUI skipped — missing DOM elements");
+  return;
+}
+
 
   if (username) {
     userGreeting.textContent = `Hello, ${username}`;
     userGreeting.classList.remove('d-none');
 
-    authButton.textContent = 'Sign Out';
-    authButton.onclick = signOut;
-    authButton.classList.remove('btn-login');
-    authButton.classList.add('btn-danger');
-
     signUpButton.style.display = 'none';
-    adminPage.classList.toggle('d-none', userGroup !== 'Admin');
-    bookingsLink.classList.remove('d-none'); 
+    signInButton.style.display = 'none';
+    signOutButton.style.display = 'inline-block';
+
+    adminPage.style.display = 'none';
+    console.log(userGroup);
+    if(userGroup == 'Admin')
+    {
+      adminPage.style.display = 'inline-block';
+    }
+    bookingsLink.style.display = 'list-item';
+    tripMapLink.style.display = 'list-item';
+
   } else {
     userGreeting.textContent = '';
     userGreeting.classList.add('d-none');
 
-    authButton.textContent = 'Login';
-    authButton.onclick = signIn;
-    authButton.classList.remove('btn-danger');
-    authButton.classList.add('btn-login');
-
     signUpButton.style.display = 'inline-block';
-    adminPage.classList.add('d-none');
-    bookingsLink.classList.add('d-none'); 
-  }
+    signInButton.style.display = 'inline-block';
+    signOutButton.style.display = 'none';
 
-  authContainer.classList.remove('d-none');
+    adminPage.style.display = 'none';
+    bookingsLink.style.display = 'none';
+    tripMapLink.style.display = 'none';
+  }
 }
+
+
 
 
 
