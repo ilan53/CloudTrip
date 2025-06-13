@@ -177,8 +177,13 @@ function setupOrderButton() {
     e.preventDefault();
 
     const userEmail = localStorage.getItem("userEmail");
-    if (!userEmail) {
-      alert("👋 Please sign in before booking a flight.");
+     if (!userEmail) {
+      Swal.fire({
+        title: "Sign In Required",
+        text: "👋 Please sign in before booking a flight.",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
       return;
     }
 
@@ -194,8 +199,13 @@ function setupOrderButton() {
     const priceText = document.getElementById("flight-price").textContent.replace("$", "");
     const price = parseFloat(priceText);
 
-    if (!flightId || !passengers || !price || !selectedClass) {
-      alert("Missing booking information. Please complete all fields.");
+     if (!flightId || !passengers || !price || !selectedClass) {
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please complete all booking fields.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
       return;
     }
 
@@ -214,14 +224,34 @@ function setupOrderButton() {
 
       const data = await res.json();
       if (res.ok) {
-        alert(`🎫 Ticket booked successfully!\n\n✈️ Flight ID: ${flightId}\n👤 Passengers: ${passengers}\n💺 Class: ${selectedClass}\n💰 Price: $${price.toFixed(2)}`);
+        Swal.fire({
+          title: "🎫 Ticket Booked!",
+          html: `
+            <strong>✈️ Flight:</strong> ${flightId}<br/>
+            <strong>👤 Passengers:</strong> ${passengers}<br/>
+            <strong>💺 Class:</strong> ${selectedClass}<br/>
+            <strong>💰 Price:</strong> $${price.toFixed(2)}
+          `,
+          icon: "success",
+          confirmButtonText: "Awesome!"
+        });
       } else {
         console.error("Error booking flight:", data);
-        alert("❌ Failed to book flight.");
+        Swal.fire({
+          title: "Booking Failed",
+          text: "❌ Failed to book flight.",
+          icon: "error",
+          confirmButtonText: "Try Again"
+        });
       }
     } catch (err) {
       console.error("❌ Network or server error:", err);
-      alert("❌ Network error occurred while booking.");
+      Swal.fire({
+        title: "Network Error",
+        text: "❌ Network error occurred while booking.",
+        icon: "error",
+        confirmButtonText: "Retry"
+      });
     }
   });
 }

@@ -64,13 +64,31 @@ async function loadBookings() {
 }
 
 async function deleteBooking(index) {
-  console.log("Deleting booking at index:", index);
   const userEmail = localStorage.getItem("userEmail");
 
   if (!userEmail) {
-    alert("User not logged in.");
+    Swal.fire({
+      title: "Not Logged In",
+      text: "Please log in to manage your bookings.",
+      icon: "warning",
+      confirmButtonText: "OK"
+    });
     return;
   }
+
+  // אישור לפני מחיקה
+  const confirm = await Swal.fire({
+    title: "Are you sure?",
+    text: "This booking will be permanently deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel"
+  });
+
+  if (!confirm.isConfirmed) return;
 
   try {
     const res = await fetch(USERS_API, {
@@ -82,14 +100,29 @@ async function deleteBooking(index) {
     const result = await res.json();
 
     if (res.ok) {
-      alert("Booking deleted successfully.");
+      await Swal.fire({
+        title: "Deleted!",
+        text: "The booking has been removed.",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
       loadBookings();
     } else {
-      alert(`Failed to delete booking: ${result.error}`);
+      Swal.fire({
+        title: "Failed",
+        text: `Failed to delete booking: ${result.error}`,
+        icon: "error",
+        confirmButtonText: "OK"
+      });
     }
   } catch (err) {
     console.error("Delete request failed:", err);
-    alert("An error occurred while deleting the booking.");
+    Swal.fire({
+      title: "Error",
+      text: "An error occurred while deleting the booking.",
+      icon: "error",
+      confirmButtonText: "OK"
+    });
   }
 }
 

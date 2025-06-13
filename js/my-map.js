@@ -27,8 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }).addTo(map);
 
   const userEmail = localStorage.getItem("userEmail");
-  if (!userEmail) {
-    alert("Please log in to see your trips on the map.");
+   if (!userEmail) {
+    Swal.fire({
+      title: "Login Required",
+      text: "Please log in to see your trips on the map.",
+      icon: "warning",
+      confirmButtonText: "OK"
+    });
     return;
   }
 
@@ -65,12 +70,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    if (visitedCities.size === 0) {
-      alert("No visited destinations found.");
+     if (visitedCities.size === 0) {
+      Swal.fire({
+        title: "No Trips Found",
+        text: "You have no visited destinations.",
+        icon: "info",
+        confirmButtonText: "OK"
+      });
     }
 
   } catch (err) {
     console.error("Error loading map data:", err);
-    alert("Failed to load your flight data.");
+    Swal.fire({
+      title: "Error",
+      text: "Failed to load your flight data.",
+      icon: "error",
+      confirmButtonText: "Retry"
+    });
   }
 });

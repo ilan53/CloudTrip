@@ -148,7 +148,7 @@ function updateAuthUI(username, userGroup) {
   const signInButton = document.querySelector('.btn-login');
   const signOutButton = document.querySelector('.btn-signout');
 
-if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInButton || !bookingsLink || !tripMapLink) {
+if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInButton || !signOutButton || !bookingsLink || !tripMapLink) {
   console.log("⏸️ updateAuthUI skipped — missing DOM elements");
   return;
 }
@@ -164,7 +164,7 @@ if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInBut
 
     adminPage.style.display = 'none';
     console.log(userGroup);
-    if(userGroup == 'Admin')
+    if(userGroup == 'Admins')
     {
       adminPage.style.display = 'inline-block';
     }
