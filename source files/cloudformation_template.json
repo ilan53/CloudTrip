@@ -482,6 +482,102 @@
       }
     },
 
+    "PutAdminLambda": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": [ "UserPool" ],
+      "Properties": {
+        "FunctionName": "putAdmin",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Environment": {
+          "Variables": {
+            "USER_POOL_ID": { "Ref": "UserPool" }
+          }
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const cognito = new AWS.CognitoIdentityServiceProvider();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email } = body;",
+                "",
+                "    if (!email) {",
+                "      return {",
+                "        statusCode: 400,",
+                "        headers: {",
+                "          'Access-Control-Allow-Origin': '*',",
+                "          'Content-Type': 'application/json'",
+                "        },",
+                "        body: JSON.stringify({ error: 'Missing email field' })",
+                "      };",
+                "    }",
+                "",
+                "    // Update DynamoDB",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET #status = :status',",
+                "      ExpressionAttributeNames: { '#status': 'status' },",
+                "      ExpressionAttributeValues: { ':status': 'admin' }",
+                "    }).promise();",
+                "",
+                "    // Move user to Admins group in Cognito",
+                "    const USER_POOL_ID = process.env.USER_POOL_ID;",
+                "    try {",
+                "      await cognito.adminRemoveUserFromGroup({",
+                "        UserPoolId: USER_POOL_ID,",
+                "        Username: email,",
+                "        GroupName: 'Users'",
+                "      }).promise();",
+                "    } catch (e) {",
+                "      // Ignore if user wasn't in Users group",
+                "    }",
+                "",
+                "    await cognito.adminAddUserToGroup({",
+                "      UserPoolId: USER_POOL_ID,",
+                "      Username: email,",
+                "      GroupName: 'Admins'",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ message: 'User promoted to admin successfully' })",
+                "    };",
+                "",
+                "  } catch (err) {",
+                "    console.error('❌ Error promoting user:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ error: err.message || 'Internal error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+
     "UserPoolTriggerLambda": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -523,7 +619,8 @@
                 "      name: userAttributes.name,",
                 "      family_name: userAttributes.family_name,",
                 "      username: username,",
-                "      bookedFlights: []",
+                "      bookedFlights: [],",
+                "      status: \"user\"",
                 "    };",
                 "",
                 "    await dynamoDb.send(new PutCommand({",
@@ -686,7 +783,9 @@
         "UsersGetMethod",
         "UsersPutMethod",
         "UsersDeleteMethod",
-        "UsersOptionsMethod"
+        "UsersOptionsMethod",
+        "AdminPutMethod",
+        "AdminOptionsMethod"
       ],
       "Properties": {
         "RestApiId": {
@@ -1158,6 +1257,117 @@
         }
       }
     },
+
+
+    "AdminResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ParentId": {
+          "Fn::GetAtt": [
+            "RestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "admin"
+      }
+    },
+
+    "AdminPutMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "AdminResource" },
+        "HttpMethod": "PUT",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putAdmin/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "AdminOptionsMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "AdminResource"
+        },
+        "HttpMethod": "OPTIONS",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseTemplates": {
+                "application/json": ""
+              },
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'PUT,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "LambdaInvokePermissionPutAdmin": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": "PutAdminLambda",
+      "Properties": {
+        "FunctionName": { "Ref": "PutAdminLambda" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/PUT/admin"
+        }
+      }
+    },
+
 
     "PLOCAPIWebACL": {
       "Type": "AWS::WAFv2::WebACL",

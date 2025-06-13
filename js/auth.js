@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_J8w1GVYej',
-  ClientId: '1phntd9a135e8ps2hl2u50itg4',
+  UserPoolId: 'us-east-1_6XTBsOT2Q',
+  ClientId: '5s4a2i7sqg7ov9am4cf4gk460v',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -102,9 +102,6 @@ function displayUserInfo(idToken) {
     // עדכן את ה־UI עם שם מלא
     updateAuthUI(fullName, userGroup);
 
-    // סנכרן את המשתמש לדיינמונדבי
-   // syncUserToDynamo(fullName, email);
-
   } catch (error) {
     console.error('Error displaying user info:', error);
     Swal.fire({
@@ -116,26 +113,7 @@ function displayUserInfo(idToken) {
 }
 
 
-
-//async function syncUserToDynamo(fullName, email) {
- // try {
- //   const response = await fetch('https://8r8jt6jpy9.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
- //     method: 'POST',
- //     headers: {
- //       'Content-Type': 'application/json'
- //     },
- //     body: JSON.stringify({ fullName, email })
- //   });
-
- //   if (!response.ok) throw new Error('Sync failed');
- //   console.log('User synced to DynamoDB');
- // } catch (err) {
- //   console.error('Error syncing user:', err);
- // }
-//}
-
 function updateAuthUI(username, userGroup) {
-  console.log("a");
   const userGreeting = document.getElementById('userGreeting');
 
   const adminPage = document.querySelector('.adminCheck');
