@@ -498,9 +498,11 @@
               [
                 "const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");",
                 "const { DynamoDBDocumentClient, PutCommand } = require(\"@aws-sdk/lib-dynamodb\");",
+                "const { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } = require(\"@aws-sdk/client-cognito-identity-provider\");",
                 "",
-                "const client = new DynamoDBClient({});",
-                "const dynamoDb = DynamoDBDocumentClient.from(client);",
+                "const dynamoClient = new DynamoDBClient({});",
+                "const dynamoDb = DynamoDBDocumentClient.from(dynamoClient);",
+                "const cognitoClient = new CognitoIdentityProviderClient({});",
                 "",
                 "exports.handler = async (event) => {",
                 "  console.log(\"Event:\", JSON.stringify(event, null, 2));",
@@ -508,6 +510,7 @@
                 "  try {",
                 "    const userAttributes = event.request.userAttributes;",
                 "    const username = event.userName;",
+                "    const userPoolId = event.userPoolId;",
                 "",
                 "    if (!userAttributes.sub || !userAttributes.email || !userAttributes.name || !userAttributes.family_name || !username) {",
                 "      console.error(\"Missing required user attributes or username\");",
@@ -523,17 +526,22 @@
                 "      bookedFlights: []",
                 "    };",
                 "",
-                "    const params = {",
+                "    await dynamoDb.send(new PutCommand({",
                 "      TableName: \"Users\",",
                 "      Item: newUser",
-                "    };",
-                "",
-                "    await dynamoDb.send(new PutCommand(params));",
+                "    }));",
                 "    console.log(\"✅ User added to DynamoDB:\", newUser);",
+                "",
+                "    await cognitoClient.send(new AdminAddUserToGroupCommand({",
+                "      UserPoolId: userPoolId,",
+                "      Username: username,",
+                "      GroupName: 'Users'",
+                "    }));",
+                "    console.log(\"✅ User added to Cognito group: Users\");",
                 "",
                 "    return event;",
                 "  } catch (error) {",
-                "    console.error(\"❌ Error inserting user to DynamoDB:\", error);",
+                "    console.error(\"❌ Error:\", error);",
                 "    throw error;",
                 "  }",
                 "};"
@@ -543,6 +551,7 @@
         }
       }
     },
+
 
 
     "UserPool": {
@@ -633,6 +642,18 @@
         "GroupName": "Admins",
         "UserPoolId": { "Ref": "UserPool" },
         "Description": "Admin group for CloudTrip",
+        "RoleArn": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        }
+      }
+    },
+
+    "UserGroupUsers": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "Users",
+        "UserPoolId": { "Ref": "UserPool" },
+        "Description": "Users group for CloudTrip",
         "RoleArn": {
           "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
         }
