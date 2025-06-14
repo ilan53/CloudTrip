@@ -235,6 +235,13 @@ function setupOrderButton() {
           icon: "success",
           confirmButtonText: "Awesome!"
         });
+       } else if (data?.error === "Subscription not confirmed" || data?.error === "Subscription required") {
+        Swal.fire({
+          title: "📩 Confirm Your Email",
+          text: data.message || "Please confirm your email subscription before booking a flight.",
+          icon: "warning",
+          confirmButtonText: "OK"
+        });
       } else {
         console.error("Error booking flight:", data);
         Swal.fire({
