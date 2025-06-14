@@ -1,0 +1,116 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "PutAdminLambda": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": [ "UserPool" ],
+      "Properties": {
+        "FunctionName": "putAdmin",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Environment": {
+          "Variables": {
+            "USER_POOL_ID": { "Ref": "UserPool" }
+          }
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const cognito = new AWS.CognitoIdentityServiceProvider();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email } = body;",
+                "",
+                "    if (!email) {",
+                "      return {",
+                "        statusCode: 400,",
+                "        headers: {",
+                "          'Access-Control-Allow-Origin': '*',",
+                "          'Content-Type': 'application/json'",
+                "        },",
+                "        body: JSON.stringify({ error: 'Missing email field' })",
+                "      };",
+                "    }",
+                "",
+                "    // Update DynamoDB",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET #status = :status',",
+                "      ExpressionAttributeNames: { '#status': 'status' },",
+                "      ExpressionAttributeValues: { ':status': 'admin' }",
+                "    }).promise();",
+                "",
+                "    // Move user to Admins group in Cognito",
+                "    const USER_POOL_ID = process.env.USER_POOL_ID;",
+                "    try {",
+                "      await cognito.adminRemoveUserFromGroup({",
+                "        UserPoolId: USER_POOL_ID,",
+                "        Username: email,",
+                "        GroupName: 'Users'",
+                "      }).promise();",
+                "    } catch (e) {",
+                "      // Ignore if user wasn't in Users group",
+                "    }",
+                "",
+                "    await cognito.adminAddUserToGroup({",
+                "      UserPoolId: USER_POOL_ID,",
+                "      Username: email,",
+                "      GroupName: 'Admins'",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ message: 'User promoted to admin successfully' })",
+                "    };",
+                "",
+                "  } catch (err) {",
+                "    console.error('❌ Error promoting user:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ error: err.message || 'Internal error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "Outputs": {
+      "LambdaFunctionName": {
+        "Description": "Lambda Function Name",
+        "Value": {
+          "Ref": "GetUsersLambda"
+        }
+      },
+      "LambdaFunctionArn": {
+        "Description": "Lambda ARN",
+        "Value": {
+          "Fn::GetAtt": [
+            "GetUsersLambda",
+            "Arn"
+          ]
+        }
+      }
+    }
+  }
