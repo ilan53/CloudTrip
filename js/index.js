@@ -1,11 +1,10 @@
+  let filteredFlights = [];
+  let currentFlight = null;
+  
 document.addEventListener("DOMContentLoaded", () => {
   populateFromSelect();
   setupOrderButton();
   const userEmail = localStorage.getItem("userEmail");
-  const myBookingsLink = document.getElementById("myBookingsLink");
-  if (userEmail && myBookingsLink) {
-    myBookingsLink.classList.remove("d-none");
-  }
 });
 
 async function populateFromSelect() {
@@ -20,7 +19,6 @@ async function populateFromSelect() {
     setupDateSelect(flights);
   } catch (error) {
     console.error("Error loading cities:", error);
-    alert("Failed to load flight data.");
   } finally {
     loadingMessage.style.display = "none";
   }
@@ -109,9 +107,6 @@ function setupDateSelect(flights) {
   const priceDisplay = document.getElementById("flight-price");
   const passengersInput = document.getElementById("passengers");
 
-  let filteredFlights = [];
-  let currentFlight = null;
-
   classSelect.addEventListener("change", () => {
     const from = fromSelect.value;
     const to = toSelect.value;
@@ -182,9 +177,13 @@ function setupOrderButton() {
     e.preventDefault();
 
     const userEmail = localStorage.getItem("userEmail");
-    if (!userEmail) {
-      alert("👋 Please sign in before booking a flight.");
-      window.location.href = "https://cloudtripuserpool.auth.us-east-1.amazoncognito.com/login?client_id=6pk04s75djbfe9ajrboae9o5jq&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html";
+     if (!userEmail) {
+      Swal.fire({
+        title: "Sign In Required",
+        text: "👋 Please sign in before booking a flight.",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
       return;
     }
 
@@ -194,13 +193,19 @@ function setupOrderButton() {
     const passengers = parseInt(document.getElementById("passengers").value);
     const date = document.getElementById("departure-date").value;
     const currentFlight = filteredFlights.find(f => f.date === date);
-    const flightId = `${currentFlight.operator} ${currentFlight.flightNumber}-${currentFlight.date}-${currentFlight.time} (${passengers}Adults-${selectedClass}-${currentFlight.price}) from ${currentFlight.from} to ${currentFlight.to} (${currentFlight.countryTo})`;
+    const flightId = `${currentFlight.flightNumber}-${currentFlight.date}-${currentFlight.time} (${passengers}Adults-${selectedClass}-${currentFlight.price}$) from ${currentFlight.from} to ${currentFlight.to}`;
+
 
     const priceText = document.getElementById("flight-price").textContent.replace("$", "");
     const price = parseFloat(priceText);
 
-    if (!flightId || !passengers || !price || !selectedClass) {
-      alert("Missing booking information. Please complete all fields.");
+     if (!flightId || !passengers || !price || !selectedClass) {
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please complete all booking fields.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
       return;
     }
 
@@ -219,14 +224,78 @@ function setupOrderButton() {
 
       const data = await res.json();
       if (res.ok) {
-        alert(`🎫 Ticket booked successfully!\n\n✈️ Flight ID: ${flightId}\n👤 Passengers: ${passengers}\n💺 Class: ${selectedClass}\n💰 Price: $${price.toFixed(2)}`);
+        Swal.fire({
+          title: "🎫 Ticket Booked!",
+          html: `
+            <strong>✈️ Flight:</strong> ${flightId}<br/>
+            <strong>👤 Passengers:</strong> ${passengers}<br/>
+            <strong>💺 Class:</strong> ${selectedClass}<br/>
+            <strong>💰 Price:</strong> $${price.toFixed(2)}
+          `,
+          icon: "success",
+          confirmButtonText: "Awesome!"
+        });
       } else {
         console.error("Error booking flight:", data);
-        alert("❌ Failed to book flight.");
+        Swal.fire({
+          title: "Booking Failed",
+          text: "❌ Failed to book flight.",
+          icon: "error",
+          confirmButtonText: "Try Again"
+        });
       }
     } catch (err) {
       console.error("❌ Network or server error:", err);
-      alert("❌ Network error occurred while booking.");
+      Swal.fire({
+        title: "Network Error",
+        text: "❌ Network error occurred while booking.",
+        icon: "error",
+        confirmButtonText: "Retry"
+      });
     }
   });
 }
+
+
+function createNavbar() {
+  const navbar = `
+    <div class="logo">
+      <img src="img/logo.png" alt="CloudTrip Logo">
+    </div>
+    <nav>
+      <div class="nav-left">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pages/mostVisited.html" class="mostVisted">Most Visited</a></li>
+          <li><a href="pages/my-bookings.html" class="myBooking">My Bookings</a></li> 
+          <li><a href="pages/my-map.html" class="TripMap">My Trips Map</a></li>
+          <li><a href="pages/admin.html" class="adminCheck">Admin Panel</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <ul id="authContainer">
+          <li><span id="userGreeting" class="d-none me-2"></span></li>
+          <li><a href="#" class="btn-login" onclick="signIn()">Login</a></li>
+          <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+          <li><a href="#" class="btn-signout btn-danger" onclick="signOut()">Sign Out</a></li>
+        </ul>
+      </div>
+    </nav>
+  `;
+
+  const header = document.querySelector('header');
+  if (header){ 
+    header.innerHTML = navbar;
+
+    // הדגשת הקישור הפעיל
+    const currentPage = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.nav-left a').forEach(link => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref.includes(currentPage)) {
+        link.classList.add('active');
+      }
+    });
+  }
+}
+
+createNavbar();

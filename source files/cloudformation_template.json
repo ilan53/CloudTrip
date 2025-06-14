@@ -359,7 +359,9 @@
               [
                 "const AWS = require('aws-sdk');",
                 "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const sns = new AWS.SNS();",
                 "const TABLE_NAME = 'Users';",
+                "const TOPIC_ARN = 'arn:aws:sns:us-east-1:286801031611:FlightBookingTopic';",
                 "",
                 "exports.handler = async (event) => {",
                 "  try {",
@@ -382,14 +384,26 @@
                 "      }",
                 "    }).promise();",
                 "",
+                "    await sns.subscribe({",
+                "      TopicArn: TOPIC_ARN,",
+                "      Protocol: 'email',",
+                "      Endpoint: email",
+                "    }).promise();",
+                "",
+                "    await sns.publish({",
+                "      TopicArn: TOPIC_ARN,",
+                "      Message: `Hello,\\n\\nYour flight has been successfully booked!\\nFlight ID: ${flightId}`,",
+                "      Subject: 'CloudTrip \u2013 Flight Booking Confirmation'",
+                "    }).promise();",
+                "",
                 "    return {",
                 "      statusCode: 200,",
                 "      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },",
-                "      body: JSON.stringify({ message: 'User updated successfully', newBooking })",
+                "      body: JSON.stringify({ message: 'User updated and email notification sent', newBooking })",
                 "    };",
                 "",
                 "  } catch (err) {",
-                "    console.error('❌ Error updating user:', err);",
+                "    console.error('\u274c Error updating user or sending email:', err);",
                 "    return {",
                 "      statusCode: 500,",
                 "      headers: { 'Access-Control-Allow-Origin': '*' },",
@@ -404,6 +418,165 @@
       }
     },
 
+    "DeleteUserBookingLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "deleteUserBooking",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email, index } = body;",
+                "",
+                "    if (!email || index === undefined) {",
+                "      return { statusCode: 400, body: JSON.stringify({ error: 'Missing email or index' }) };",
+                "    }",
+                "",
+                "    const user = await docClient.get({ TableName: TABLE_NAME, Key: { email } }).promise();",
+                "    const bookings = user.Item?.bookedFlights || [];",
+                "",
+                "    if (index < 0 || index >= bookings.length) {",
+                "      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid index' }) };",
+                "    }",
+                "",
+                "    bookings.splice(index, 1);",
+                "",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET bookedFlights = :updated',",
+                "      ExpressionAttributeValues: { ':updated': bookings }",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },",
+                "      body: JSON.stringify({ message: 'Booking deleted successfully' })",
+                "    };",
+                "  } catch (err) {",
+                "    console.error('\u274c Error deleting booking:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: { 'Access-Control-Allow-Origin': '*' },",
+                "      body: JSON.stringify({ error: err.message || 'Internal Server Error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
+
+    "PutAdminLambda": {
+      "Type": "AWS::Lambda::Function",
+      "DependsOn": [ "UserPool" ],
+      "Properties": {
+        "FunctionName": "putAdmin",
+        "Handler": "index.handler",
+        "Runtime": "nodejs16.x",
+        "Role": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        },
+        "Environment": {
+          "Variables": {
+            "USER_POOL_ID": { "Ref": "UserPool" }
+          }
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "\n",
+              [
+                "const AWS = require('aws-sdk');",
+                "const docClient = new AWS.DynamoDB.DocumentClient();",
+                "const cognito = new AWS.CognitoIdentityServiceProvider();",
+                "const TABLE_NAME = 'Users';",
+                "",
+                "exports.handler = async (event) => {",
+                "  try {",
+                "    const body = JSON.parse(event.body);",
+                "    const { email } = body;",
+                "",
+                "    if (!email) {",
+                "      return {",
+                "        statusCode: 400,",
+                "        headers: {",
+                "          'Access-Control-Allow-Origin': '*',",
+                "          'Content-Type': 'application/json'",
+                "        },",
+                "        body: JSON.stringify({ error: 'Missing email field' })",
+                "      };",
+                "    }",
+                "",
+                "    // Update DynamoDB",
+                "    await docClient.update({",
+                "      TableName: TABLE_NAME,",
+                "      Key: { email },",
+                "      UpdateExpression: 'SET #status = :status',",
+                "      ExpressionAttributeNames: { '#status': 'status' },",
+                "      ExpressionAttributeValues: { ':status': 'admin' }",
+                "    }).promise();",
+                "",
+                "    // Move user to Admins group in Cognito",
+                "    const USER_POOL_ID = process.env.USER_POOL_ID;",
+                "    try {",
+                "      await cognito.adminRemoveUserFromGroup({",
+                "        UserPoolId: USER_POOL_ID,",
+                "        Username: email,",
+                "        GroupName: 'Users'",
+                "      }).promise();",
+                "    } catch (e) {",
+                "      // Ignore if user wasn't in Users group",
+                "    }",
+                "",
+                "    await cognito.adminAddUserToGroup({",
+                "      UserPoolId: USER_POOL_ID,",
+                "      Username: email,",
+                "      GroupName: 'Admins'",
+                "    }).promise();",
+                "",
+                "    return {",
+                "      statusCode: 200,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ message: 'User promoted to admin successfully' })",
+                "    };",
+                "",
+                "  } catch (err) {",
+                "    console.error('❌ Error promoting user:', err);",
+                "    return {",
+                "      statusCode: 500,",
+                "      headers: {",
+                "        'Access-Control-Allow-Origin': '*',",
+                "        'Content-Type': 'application/json'",
+                "      },",
+                "      body: JSON.stringify({ error: err.message || 'Internal error' })",
+                "    };",
+                "  }",
+                "};"
+              ]
+            ]
+          }
+        }
+      }
+    },
 
     "UserPoolTriggerLambda": {
       "Type": "AWS::Lambda::Function",
@@ -421,9 +594,11 @@
               [
                 "const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");",
                 "const { DynamoDBDocumentClient, PutCommand } = require(\"@aws-sdk/lib-dynamodb\");",
+                "const { CognitoIdentityProviderClient, AdminAddUserToGroupCommand } = require(\"@aws-sdk/client-cognito-identity-provider\");",
                 "",
-                "const client = new DynamoDBClient({});",
-                "const dynamoDb = DynamoDBDocumentClient.from(client);",
+                "const dynamoClient = new DynamoDBClient({});",
+                "const dynamoDb = DynamoDBDocumentClient.from(dynamoClient);",
+                "const cognitoClient = new CognitoIdentityProviderClient({});",
                 "",
                 "exports.handler = async (event) => {",
                 "  console.log(\"Event:\", JSON.stringify(event, null, 2));",
@@ -431,6 +606,7 @@
                 "  try {",
                 "    const userAttributes = event.request.userAttributes;",
                 "    const username = event.userName;",
+                "    const userPoolId = event.userPoolId;",
                 "",
                 "    if (!userAttributes.sub || !userAttributes.email || !userAttributes.name || !userAttributes.family_name || !username) {",
                 "      console.error(\"Missing required user attributes or username\");",
@@ -443,20 +619,26 @@
                 "      name: userAttributes.name,",
                 "      family_name: userAttributes.family_name,",
                 "      username: username,",
-                "      bookedFlights: []",
+                "      bookedFlights: [],",
+                "      status: \"user\"",
                 "    };",
                 "",
-                "    const params = {",
+                "    await dynamoDb.send(new PutCommand({",
                 "      TableName: \"Users\",",
                 "      Item: newUser",
-                "    };",
-                "",
-                "    await dynamoDb.send(new PutCommand(params));",
+                "    }));",
                 "    console.log(\"✅ User added to DynamoDB:\", newUser);",
+                "",
+                "    await cognitoClient.send(new AdminAddUserToGroupCommand({",
+                "      UserPoolId: userPoolId,",
+                "      Username: username,",
+                "      GroupName: 'Users'",
+                "    }));",
+                "    console.log(\"✅ User added to Cognito group: Users\");",
                 "",
                 "    return event;",
                 "  } catch (error) {",
-                "    console.error(\"❌ Error inserting user to DynamoDB:\", error);",
+                "    console.error(\"❌ Error:\", error);",
                 "    throw error;",
                 "  }",
                 "};"
@@ -466,6 +648,7 @@
         }
       }
     },
+
 
 
     "UserPool": {
@@ -562,6 +745,18 @@
       }
     },
 
+    "UserGroupUsers": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "GroupName": "Users",
+        "UserPoolId": { "Ref": "UserPool" },
+        "Description": "Users group for CloudTrip",
+        "RoleArn": {
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+        }
+      }
+    },
+
     "UserPoolDomain": {
       "Type": "AWS::Cognito::UserPoolDomain",
       "Properties": {
@@ -587,7 +782,10 @@
         "FlightsOptionsMethod",
         "UsersGetMethod",
         "UsersPutMethod",
-        "UsersOptionsMethod"
+        "UsersDeleteMethod",
+        "UsersOptionsMethod",
+        "AdminPutMethod",
+        "AdminOptionsMethod"
       ],
       "Properties": {
         "RestApiId": {
@@ -940,6 +1138,48 @@
         ]
       }
     },
+
+    "UsersDeleteMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "UsersResource"
+        },
+        "HttpMethod": "DELETE",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:deleteUserBooking/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
     "UsersOptionsMethod": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
@@ -964,7 +1204,7 @@
               },
               "ResponseParameters": {
                 "method.response.header.Access-Control-Allow-Headers": "'*'",
-                "method.response.header.Access-Control-Allow-Methods": "'GET,PUT,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Methods": "'GET,PUT,DELETE,OPTIONS'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
@@ -1006,6 +1246,128 @@
         }
       }
     },
+    "LambdaInvokePermissionDeleteUserBooking": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": "deleteUserBooking",
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/DELETE/users"
+        }
+      }
+    },
+
+
+    "AdminResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ParentId": {
+          "Fn::GetAtt": [
+            "RestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "admin"
+      }
+    },
+
+    "AdminPutMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": { "Ref": "AdminResource" },
+        "HttpMethod": "PUT",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:putAdmin/invocations"
+          }
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "400",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          },
+          {
+            "StatusCode": "500",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "AdminOptionsMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "RestApi"
+        },
+        "ResourceId": {
+          "Ref": "AdminResource"
+        },
+        "HttpMethod": "OPTIONS",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseTemplates": {
+                "application/json": ""
+              },
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'PUT,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          ]
+        },
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true
+            }
+          }
+        ]
+      }
+    },
+
+    "LambdaInvokePermissionPutAdmin": {
+      "Type": "AWS::Lambda::Permission",
+      "DependsOn": "PutAdminLambda",
+      "Properties": {
+        "FunctionName": { "Ref": "PutAdminLambda" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestApi}/*/PUT/admin"
+        }
+      }
+    },
+
 
     "PLOCAPIWebACL": {
       "Type": "AWS::WAFv2::WebACL",
@@ -1071,82 +1433,21 @@
           "Fn::GetAtt": [ "PLOCAPIWebACL", "Arn" ]
         }
       }
+    },
+
+    "FlightBookingTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": "FlightBookingTopic"
+      }
     }
   },
-
 
   "Outputs": {
     "S3WebsiteURL": {
       "Value": {
         "Fn::GetAtt": [ "StaticWebsiteBucket", "WebsiteURL" ]
       }
-    },
-    "GetFlightsLambdaName": {
-      "Description": "Lambda Function Name - getFlights",
-      "Value": {
-        "Ref": "GetFlightsLambda"
-      }
-    },
-    "GetFlightsLambdaArn": {
-      "Description": "Lambda ARN - getFlights",
-      "Value": {
-        "Fn::GetAtt": [
-          "GetFlightsLambda",
-          "Arn"
-        ]
-      }
-    },
-    "PutFlightsLambdaName": {
-      "Description": "Lambda Function Name - putFlights",
-      "Value": {
-        "Ref": "PutFlightsLambda"
-      }
-    },
-    "PutFlightsLambdaArn": {
-      "Description": "Lambda ARN - putFlights",
-      "Value": {
-        "Fn::GetAtt": [
-          "PutFlightsLambda",
-          "Arn"
-        ]
-      }
-    },
-    "PostFlightsLambdaName": {
-      "Description": "Lambda Function Name - postFlights",
-      "Value": {
-        "Ref": "PostFlightsLambda"
-      }
-    },
-    "PostFlightsLambdaArn": {
-      "Description": "Lambda ARN - postFlights",
-      "Value": {
-        "Fn::GetAtt": [
-          "PostFlightsLambda",
-          "Arn"
-        ]
-      }
-    },
-    "DeleteFlightsLambdaName": {
-      "Value": { "Ref": "DeleteFlightsLambda" }
-    },
-    "DeleteFlightsLambdaArn": {
-      "Value": { "Fn::GetAtt": [ "DeleteFlightsLambda", "Arn" ] }
-    },
-    "GetUsersLambdaName": {
-      "Description": "Lambda Function Name",
-      "Value": { "Ref": "GetUsersLambda" }
-    },
-    "GetUsersLambdaArn": {
-      "Description": "Lambda ARN",
-      "Value": { "Fn::GetAtt": [ "GetUsersLambda", "Arn" ] }
-    },
-    "PutUsersLambdaName": {
-      "Description": "Lambda Function Name",
-      "Value": { "Ref": "PutUsersLambda" }
-    },
-    "PutUsersLambdaArn": {
-      "Description": "Lambda ARN",
-      "Value": { "Fn::GetAtt": [ "PutUsersLambda", "Arn" ] }
     },
     "UserPoolId": {
       "Description": "Change in auth.js",
@@ -1156,38 +1457,11 @@
       "Description": "Change in auth.js",
       "Value": { "Ref": "UserPoolClient" }
     },
-    "HostedUIDomain": {
-      "Value": {
-        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com"
-      }
-    },
-    "HostedUILoginURL": {
-      "Description": "Link to Hosted Login Page",
-      "Value": {
-        "Fn::Sub": "https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=email+openid+profile&redirect_uri=https://cloudtrip3.s3.us-east-1.amazonaws.com/index.html"
-      }
-    },
-    "ManualSetupInstructions": {
-      "Description": "Manual step: Configure Managed Login Style in Cognito Console",
-      "Value": "1. Go to Cognito → User Pool → Managed Login\n2. Click 'Create Style' and assign to CloudTripClient\n3. Customize branding (optional)"
-    },
-    "ApiId": {
-      "Value": {
-        "Ref": "RestApi"
-      },
-      "Description": "API Gateway ID"
-    },
     "ApiInvokeUrl": {
       "Value": {
         "Fn::Sub": "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
       },
-      "Description": "Public invoke URL"
-    },
-    "WebACLArn": {
-      "Description": "ARN of the created WebACL",
-      "Value": {
-        "Fn::GetAtt": [ "PLOCAPIWebACL", "Arn" ]
-      }
+      "Description": "Change in sharedApi.js"
     }
   }
 }

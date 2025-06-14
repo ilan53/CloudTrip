@@ -173,3 +173,28 @@ form {
   padding-bottom: 3px;
 }
 
+/* Normalize all selects and inputs in the form */
+#flight-search-form .form-group select,
+#flight-search-form .form-group input {
+  min-height: 44px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure form-groups are aligned vertically and evenly */
+#flight-search-form .form-group {
+  min-width: 200px;
+  flex: 1 1 200px;
+}
+
+/* Let the info row align items to top consistently */
+#flight-info-row {
+  align-items: flex-start;
+}
+
+/* Ensure p.highlight-box doesn't shrink */
+#flight-info-row .highlight-box {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}

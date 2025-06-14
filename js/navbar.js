@@ -1,9 +1,4 @@
 function createNavbar() {
-  const userEmail = localStorage.getItem("userEmail");
-  const userName = localStorage.getItem("userName") || userEmail?.split('@')[0] || '';
-  const currentPage = window.location.pathname.split('/').pop();
-  const isLoggedIn = !!userEmail;
-
   const navbar = `
     <div class="logo">
       <img src="../img/logo.png" alt="CloudTrip Logo">
@@ -12,28 +7,25 @@ function createNavbar() {
       <div class="nav-left">
         <ul>
           <li><a href="../index.html">Home</a></li>
-          <li><a href="mostVisited.html">Most Visited</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          ${isLoggedIn ? `<li><a href="my-bookings.html">My Bookings</a></li>` : ""}
-          <li id="adminCheck" class="d-none"><a href="admin.html">Admin Panel</a></li>
+          <li><a href="mostVisited.html" class="mostVisted">Most Visited</a></li>
+          <li><a href="my-bookings.html" class="myBooking">My Bookings</a></li> 
+          <li><a href="my-map.html" class="TripMap">My Trips Map</a></li>
+          <li><a href="admin.html" class="adminCheck">Admin Panel</a></li>
         </ul>
       </div>
       <div class="nav-right">
         <ul id="authContainer">
-          ${isLoggedIn ? `
-            <li><span id="userGreeting">Hello, ${userName}</span></li>
-            <li><button class="btn-signout" onclick="signOut()">Sign Out</button></li>
-          ` : `
-            <li><a href="#" id="authButton" class="btn-login">Login</a></li>
-            <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
-          `}
+          <li><span id="userGreeting" class="d-none me-2"></span></li>
+          <li><a href="#" class="btn-login" onclick="signIn()">Login</a></li>
+          <li><a href="#" class="btn-signup" onclick="signUp()">Sign Up</a></li>
+          <li><a href="#" class="btn-signout btn-danger" onclick="signOut()">Sign Out</a></li>
         </ul>
       </div>
     </nav>
   `;
 
   const header = document.querySelector('header');
-  if (header) {
+  if (header){ 
     header.innerHTML = navbar;
 
     // הדגשת הקישור הפעיל
@@ -47,8 +39,4 @@ function createNavbar() {
   }
 }
 
-function signOut() {
-  localStorage.removeItem("userEmail");
-  localStorage.removeItem("userName");
-  window.location.href = "../index.html";
-}
+createNavbar();

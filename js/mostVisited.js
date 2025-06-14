@@ -1,41 +1,64 @@
-const USERS_API = "https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/users";
-
-const airlineToCountry = {
-  "LY": "Israel",
-  "U2": "United Kingdom",
-  "LH": "Germany",
-  "A3": "Greece",
-  "W6": "Hungary",
-  "FR": "Ireland"
-};
-
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("top-destinations");
 
+  const cityToCountry = {
+    "Barcelona": "Spain",
+    "Berlin": "Germany",
+    "Tel Aviv": "Israel",
+    "Paris": "France",
+    "Athens": "Greece",
+    "London": "United Kingdom",
+    "Rome": "Italy",
+    "Munich": "Germany"
+  };
+
   try {
     const res = await fetch(USERS_API);
+    if (!res.ok) throw new Error("Failed to fetch users.");
     const users = await res.json();
 
-    const counts = {};
+    const countryCounts = {};
 
     users.forEach(user => {
       (user.bookedFlights || []).forEach(flight => {
-        const airlineCode = flight.split(" ")[0]; // שולף LY, LH וכו'
-        const country = airlineToCountry[airlineCode] || "Unknown";
-        counts[country] = (counts[country] || 0) + 1;
+        const toMatch = flight.match(/to ([A-Za-z\s]+) \(/);
+        const toCity = toMatch ? toMatch[1].trim() : "Unknown";
+        const country = cityToCountry[toCity] || "Unknown";
+
+        countryCounts[country] = (countryCounts[country] || 0) + 1;
       });
     });
 
-    const sorted = Object.entries(counts)
+    const sortedCountries = Object.entries(countryCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
 
+    const maxCount = Math.max(...Object.values(countryCounts));
+
     container.innerHTML = `
       <h2>🌍 Top 10 Most Visited Countries</h2>
-      <ul>
-        ${sorted.map(([country, count]) => `<li>${country} – ${count} bookings</li>`).join("")}
+      <ul class="destination-list">
+        ${sortedCountries.map(([country, count], index) => `
+          <li>
+            ${
+              maxCount > 1
+                ? index === 0
+                  ? '🏆'
+                  : index === 1
+                  ? '🥈'
+                  : index === 2
+                  ? '🥉'
+                  : ''
+                : ''
+            }
+            <img src="../img/flags/${country.toLowerCase().replace(/\s/g, "-")}.png"
+                 alt="${country} flag" class="flag" onerror="this.style.display='none'" />
+            ${country} – ${count} bookings
+          </li>
+        `).join("")}
       </ul>
     `;
+
   } catch (err) {
     container.textContent = "Failed to load destinations.";
     console.error("❌ Error loading destinations:", err);

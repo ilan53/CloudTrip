@@ -1,5 +1,3 @@
-const USERS_API = "https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/users";
-
 document.addEventListener("DOMContentLoaded", loadBookings);
 
 async function loadBookings() {
@@ -24,34 +22,40 @@ async function loadBookings() {
     container.innerHTML = "";
 
     user.bookedFlights.forEach((booking, index) => {
-      const item = document.createElement("div");
-      item.classList.add("booking-card");
+  const item = document.createElement("div");
+  item.classList.add("booking-card");
 
-      const flightIdMatch = booking.match(/^([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
-      const extrasMatch = booking.match(/\((.*?)\)/);
+  const flightIdMatch = booking.match(/([A-Z0-9]+ [0-9]+)-(\d{4}-\d{2}-\d{2})-(\d{2}:\d{2})/);
+  const extrasMatch = booking.match(/\((.*?)\)/);
+  const routeMatch = booking.match(/from ([A-Za-z\s]+) to ([A-Za-z\s]+) \(/);
 
-      const flightId = flightIdMatch ? flightIdMatch[1] : "N/A";
-      const date = flightIdMatch ? flightIdMatch[2] : "N/A";
-      const time = flightIdMatch ? flightIdMatch[3] : "N/A";
-      const details = extrasMatch ? extrasMatch[1] : "N/A";
+  const flightId = flightIdMatch ? flightIdMatch[1] : "N/A";
+  const date = flightIdMatch ? flightIdMatch[2] : "N/A";
+  const time = flightIdMatch ? flightIdMatch[3] : "N/A";
+  const details = extrasMatch ? extrasMatch[1] : "N/A";
+  const [passengers, flightClass, price] = details.split("-");
+  const fromCity = routeMatch ? routeMatch[1].trim() : "N/A";
+  const toCity = routeMatch ? routeMatch[2].trim() : "N/A";
 
-      const [passengers, flightClass, price] = details.split("-");
+  item.innerHTML = `
+    <div class="booking-info">
+      <h3>✈️ Flight ${flightId}</h3>
+      <p><strong>📅 Date:</strong> ${date}</p>
+      <p><strong>⏰ Time:</strong> ${time}</p>
+      <p><strong>🌍 From:</strong> ${fromCity}</p>
+      <p><strong>🧭 To:</strong> ${toCity}</p>
+      <p><strong>👤 Passengers:</strong> ${passengers}</p>
+      <p><strong>💺 Class:</strong> ${flightClass}</p>
+      <p><strong>💰 Price:</strong> $${price}</p>
+    </div>
+    <div class="actions">
+      <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
+    </div>
+  `;
 
-      item.innerHTML = `
-        <div class="booking-info">
-          <h3>✈️ Flight ${flightId}</h3>
-          <p><strong>📅 Date:</strong> ${date}</p>
-          <p><strong>⏰ Time:</strong> ${time}</p>
-          <p><strong>👤 Passengers:</strong> ${passengers}</p>
-          <p><strong>💺 Class:</strong> ${flightClass}</p>
-          <p><strong>💰 Price:</strong> $${price}</p>
-        </div>
-        <div class="actions">
-          <button onclick="deleteBooking(${index})" title="Delete" class="icon-btn delete">🗑️</button>
-        </div>
-      `;
-      container.appendChild(item);
-    });
+  container.appendChild(item);
+});
+
 
   } catch (err) {
     console.error("Error loading bookings:", err);
@@ -60,13 +64,31 @@ async function loadBookings() {
 }
 
 async function deleteBooking(index) {
-  console.log("Deleting booking at index:", index);
   const userEmail = localStorage.getItem("userEmail");
 
   if (!userEmail) {
-    alert("User not logged in.");
+    Swal.fire({
+      title: "Not Logged In",
+      text: "Please log in to manage your bookings.",
+      icon: "warning",
+      confirmButtonText: "OK"
+    });
     return;
   }
+
+  // אישור לפני מחיקה
+  const confirm = await Swal.fire({
+    title: "Are you sure?",
+    text: "This booking will be permanently deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel"
+  });
+
+  if (!confirm.isConfirmed) return;
 
   try {
     const res = await fetch(USERS_API, {
@@ -78,17 +100,31 @@ async function deleteBooking(index) {
     const result = await res.json();
 
     if (res.ok) {
-      alert("Booking deleted successfully.");
+      await Swal.fire({
+        title: "Deleted!",
+        text: "The booking has been removed.",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
       loadBookings();
     } else {
-      alert(`Failed to delete booking: ${result.error}`);
+      Swal.fire({
+        title: "Failed",
+        text: `Failed to delete booking: ${result.error}`,
+        icon: "error",
+        confirmButtonText: "OK"
+      });
     }
   } catch (err) {
     console.error("Delete request failed:", err);
-    alert("An error occurred while deleting the booking.");
+    Swal.fire({
+      title: "Error",
+      text: "An error occurred while deleting the booking.",
+      icon: "error",
+      confirmButtonText: "OK"
+    });
   }
 }
 
 
 window.deleteBooking = deleteBooking;
-window.editBooking = editBooking;

@@ -39,7 +39,7 @@ function renderTable(items, type) {
 
     let headers;
     if (type === "users") {
-        headers = ["userId", "username", "email", "name", "family_name", "bookedFlights"];
+        headers = ["userId", "username", "email", "name", "family_name", "bookedFlights", "status"];
     } else {
         headers = Object.keys(items[0]);
     }
@@ -47,10 +47,8 @@ function renderTable(items, type) {
     let table = "<table class='data-table'><thead><tr>";
 
     // Render column headers
-    headers.forEach(h => table += `<th>${h}</th>`);
-    if (type === "flights") {
-        table += "<th>Actions</th>";  // Add actions column only for flights
-    }
+    headers.forEach(h => table += `<th>${h}</th>`);    
+    table += "<th>Actions</th>"; 
     table += "</tr></thead><tbody>";
 
     // Render table rows
@@ -67,8 +65,18 @@ function renderTable(items, type) {
                 <button onclick='editFlight(${JSON.stringify(item)})'>Edit</button>
                 <button onclick='deleteFlight("${item.id}")'>Delete</button>
             </td>`;
+        } else if (type === "users") {
+            if(item.status !== 'admin'){
+            table += `<td>           
+                <button onclick='makeAdmin("${item.email}")'>Make Admin</button>
+            </td>`;
+            }
+            else{
+                table += `<td>           
+                👑 
+            </td>`;
+            }
         }
-
         table += "</tr>";
     });
 
@@ -196,3 +204,37 @@ document.addEventListener("DOMContentLoaded", () => {
     loadFlights();     
     setupSearch();     
 });
+
+async function makeAdmin(email) {
+  try {
+    const res = await fetch(ADMIN_API, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, status: "admin" })
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "User Promoted",
+        text: `✅ ${email} is now an admin`
+      });
+      loadUsers(); 
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Promote",
+        text: result.error || "Unknown error"
+      });
+    }
+  } catch (err) {
+    console.error("Error promoting user:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Something went wrong"
+    });
+  }
+}

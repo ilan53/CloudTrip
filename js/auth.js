@@ -1,6 +1,6 @@
 const cognitoConfig = {
-  UserPoolId: 'us-east-1_XQRwAw4VS'	,
-  ClientId: '5foi8ji8i5dlg7f6m04altov4q',
+  UserPoolId: 'us-east-1_6XTBsOT2Q',
+  ClientId: '5s4a2i7sqg7ov9am4cf4gk460v',
   Domain: 'cloudtripuserpool',
   ClientSecret: '5gcpn05nbgv2u15qbcg5e4acnsvvutgi3hf1t85ijk6i7pr3744',
   Region: 'us-east-1',
@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
       window.history.replaceState({}, document.title, currentUrl);
     } else {
       updateAuthUI(null);
-      createNavbar();
     }
   }
 });
@@ -41,10 +40,8 @@ function signIn() {
 function signOut() {
   const url = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/logout?client_id=${cognitoConfig.ClientId}&logout_uri=${encodeURIComponent(cognitoConfig.redirectUri)}`;
   localStorage.removeItem('id_token');
-  localStorage.removeItem('userEmail'); // הוספה חשובה
   window.location.href = url;
 }
-
 
 async function exchangeCodeForTokens(code) {
   const tokenEndpoint = `https://${cognitoConfig.Domain}.auth.${cognitoConfig.Region}.amazoncognito.com/oauth2/token`;
@@ -105,12 +102,6 @@ function displayUserInfo(idToken) {
     // עדכן את ה־UI עם שם מלא
     updateAuthUI(fullName, userGroup);
 
-    // סנכרן את המשתמש לדיינמונדבי
-    syncUserToDynamo(fullName, email);
-
-    createNavbar();
-
-
   } catch (error) {
     console.error('Error displaying user info:', error);
     Swal.fire({
@@ -122,64 +113,57 @@ function displayUserInfo(idToken) {
 }
 
 
-
-async function syncUserToDynamo(fullName, email) {
-  try {
-    const response = await fetch('https://ay1rabd736.execute-api.us-east-1.amazonaws.com/prod/syncUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fullName, email })
-    });
-
-    if (!response.ok) throw new Error('Sync failed');
-    console.log('User synced to DynamoDB');
-  } catch (err) {
-    console.error('Error syncing user:', err);
-  }
-}
-
-
 function updateAuthUI(username, userGroup) {
   const userGreeting = document.getElementById('userGreeting');
-  const authButton = document.getElementById('authButton');
-  const adminPage = document.getElementById('adminCheck');
-  const authContainer = document.getElementById('authContainer');
-  const signUpButton = document.querySelector('.btn-signup');
 
-  if (!userGreeting || !authButton || !adminPage || !authContainer || !signUpButton) {
-    console.log("⏸️ UI update skipped — elements not found in DOM");
-    return;
-  }
+  const adminPage = document.querySelector('.adminCheck');
+  const bookingsLink = document.querySelector('.myBooking');
+  const tripMapLink = document.querySelector('.TripMap');
+
+  const authContainer = document.getElementById('authContainer');
+
+  const signUpButton = document.querySelector('.btn-signup');
+  const signInButton = document.querySelector('.btn-login');
+  const signOutButton = document.querySelector('.btn-signout');
+
+if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInButton || !signOutButton || !bookingsLink || !tripMapLink) {
+  console.log("⏸️ updateAuthUI skipped — missing DOM elements");
+  return;
+}
+
 
   if (username) {
     userGreeting.textContent = `Hello, ${username}`;
     userGreeting.classList.remove('d-none');
 
-    authButton.textContent = 'Sign Out';
-    authButton.onclick = signOut;
-    authButton.classList.remove('btn-login');
-    authButton.classList.add('btn-danger');
+    signUpButton.style.display = 'none';
+    signInButton.style.display = 'none';
+    signOutButton.style.display = 'inline-block';
 
-    signUpButton.style.display = 'none'; // Hide sign-up
+    adminPage.style.display = 'none';
+    console.log(userGroup);
+    if(userGroup == 'Admins')
+    {
+      adminPage.style.display = 'inline-block';
+    }
+    bookingsLink.style.display = 'list-item';
+    tripMapLink.style.display = 'list-item';
 
-    adminPage.classList.toggle('d-none', userGroup !== 'Admin');
   } else {
     userGreeting.textContent = '';
     userGreeting.classList.add('d-none');
 
-    authButton.textContent = 'Login';
-    authButton.onclick = signIn;
-    authButton.classList.remove('btn-danger');
-    authButton.classList.add('btn-login');
+    signUpButton.style.display = 'inline-block';
+    signInButton.style.display = 'inline-block';
+    signOutButton.style.display = 'none';
 
-    signUpButton.style.display = 'inline-block'; // Show sign-up
-
-    adminPage.classList.add('d-none');
+    adminPage.style.display = 'none';
+    bookingsLink.style.display = 'none';
+    tripMapLink.style.display = 'none';
   }
-
-  authContainer.classList.remove('d-none');
 }
+
+
+
 
 
