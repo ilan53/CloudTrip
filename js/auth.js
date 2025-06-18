@@ -140,14 +140,14 @@ if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInBut
     signInButton.style.display = 'none';
     signOutButton.style.display = 'inline-block';
 
-    adminPage.style.display = 'none';
+    adminPage.classList.add('d-none');
     console.log(userGroup);
     if(userGroup == 'Admins')
     {
-      adminPage.style.display = 'inline-block';
+      adminPage.classList.remove('d-none');
     }
-    bookingsLink.style.display = 'list-item';
-    tripMapLink.style.display = 'list-item';
+    bookingsLink.classList.remove('d-none');
+    tripMapLink.classList.remove('d-none');
 
   } else {
     userGreeting.textContent = '';
@@ -157,7 +157,7 @@ if (!userGreeting || !adminPage || !authContainer || !signUpButton || !signInBut
     signInButton.style.display = 'inline-block';
     signOutButton.style.display = 'none';
 
-    adminPage.style.display = 'none';
+    adminPage.classList.add('d-none');
     bookingsLink.style.display = 'none';
     tripMapLink.style.display = 'none';
   }
