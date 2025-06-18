@@ -276,7 +276,7 @@ function createNavbar() {
           <li><a href="pages/mostVisited.html" class="mostVisted">Most Visited</a></li>
           <li><a href="pages/my-bookings.html" class="myBooking">My Bookings</a></li> 
           <li><a href="pages/my-map.html" class="TripMap">My Trips Map</a></li>
-          <li><a href="pages/admin.html" class="adminCheck">Admin Panel</a></li>
+          <li><a href="pages/admin.html" class="adminCheck d-none">Admin Panel</a></li>
         </ul>
       </div>
       <div class="nav-right">
